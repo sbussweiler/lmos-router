@@ -12,7 +12,7 @@ on:
 
 jobs:
   CI:
-    uses: eclipse-lmos/.github/.github/workflows/ci.yml@pipeline
+    uses: eclipse-lmos/.github/.github/workflows/release.yml@pipeline
     permissions:
       contents: write
       packages: write
