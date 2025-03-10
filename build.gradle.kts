@@ -187,10 +187,6 @@ release {
     }
 }
 
-tasks.named("release") {
-    finalizedBy("publishAllPublicationsToMavenCentralRepository")
-}
-
 tasks.register("releaseBuild") {
     dependsOn(subprojects.mapNotNull { it.tasks.findByName("build") })
 }
