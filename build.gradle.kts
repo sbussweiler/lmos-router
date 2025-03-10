@@ -81,7 +81,7 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral(SonatypeHost.DEFAULT, automaticRelease = true)
+        publishToMavenCentral(SonatypeHost.DEFAULT)
         signAllPublications()
 
         pom {
