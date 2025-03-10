@@ -81,7 +81,7 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral(SonatypeHost.DEFAULT)
+        publishToMavenCentral(SonatypeHost.DEFAULT, automaticRelease = true)
         signAllPublications()
 
         pom {
@@ -178,15 +178,10 @@ private fun Process.readStream() =
     }
 
 release {
-    buildTasks = listOf("releaseBuild")
     newVersionCommitMessage = "New Snapshot-Version:"
     preTagCommitMessage = "Release:"
     pushReleaseVersionBranch = "release" // TODO remove after access token issues are resolved
     git {
         requireBranch = "release" // TODO remove after access token issues are resolved
     }
-}
-
-tasks.register("releaseBuild") {
-    dependsOn(subprojects.mapNotNull { it.tasks.findByName("build") })
 }
