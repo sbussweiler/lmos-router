@@ -180,8 +180,4 @@ private fun Process.readStream() =
 release {
     newVersionCommitMessage = "New Snapshot-Version:"
     preTagCommitMessage = "Release:"
-    pushReleaseVersionBranch = "release" // TODO remove after access token issues are resolved
-    git {
-        requireBranch = "release" // TODO remove after access token issues are resolved
-    }
 }
