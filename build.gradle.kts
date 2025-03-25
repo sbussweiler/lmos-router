@@ -10,8 +10,9 @@ import java.lang.System.getenv
 import java.net.URI
 
 plugins {
-    kotlin("jvm") version "2.1.10" apply false
-    kotlin("plugin.serialization") version "2.1.10" apply false
+    val kotlinVersion = "2.1.10"
+    kotlin("jvm") version kotlinVersion apply false
+    kotlin("plugin.serialization") version kotlinVersion apply false
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     id("org.jetbrains.kotlinx.kover") version "0.9.1"
     id("org.jetbrains.dokka") version "2.0.0"
