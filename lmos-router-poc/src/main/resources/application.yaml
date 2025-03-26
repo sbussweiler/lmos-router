@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+langchain4j:
+  azure-open-ai:
+    chat-model:
+      api-key: ${AZURE_OPENAI_API_KEY:your-api-key}
+      endpoint: ${AZURE_OPENAI_ENDPOINT:https://gpt4-uk.openai.azure.com}
+      deployment-name: ${AZURE_OPENAI_MODEL_NAME:GPT35T-1106}
+      log-requests-and-responses: true
+
+lmos:
+  router:
+      embedding:
+        store:
+          in-memory:
+            enabled: ${EMBEDDING_STORE_IN_MEMORY_ENABLED:false}
+          host: ${EMBEDDING_STORE_HOST:localhost}
+          port: ${EMBEDDING_STORE_PORT:6334}
+          collection: documents
+        model:
+          document-path: ${EMBEDDING_MODEL_DOCUMENT_PATH:/path/to/your/capabilities/directory}
+          local:
+            enabled: ${EMBEDDING_MODEL_LOCAL_ENABLED:true}
+            model-path: ${EMBEDDING_MODEL_LOCAL_MODEL_PATH:/path/to/your/model.onnx}
+            tokenizer-path: ${EMBEDDING_MODEL_LOCAL_TOKENIZER_PATH:/path/to/your/tokenizer.json}
+          huggingface:
+            enabled: ${EMBEDDING_MODEL_HUGGINGFACE_ENABLED:false}
+            model-name: ${EMBEDDING_MODEL_HUGGINGFACE_MODEL_NAME:mixedbread-ai/deepset-mxbai-embed-de-large-v1}
+            api-key: ${EMBEDDING_MODEL_HUGGINGFACE_API_KEY:your-api-key}
