@@ -12,6 +12,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.File
 
+const val EMBEDDING_METADATA_AGENT_ID = "agentId"
+const val EMBEDDING_METADATA_CAPABILITY_ID = "capabilityId"
+const val EMBEDDING_METADATA_CAPABILITY_NAME = "capabilityName"
+const val EMBEDDING_METADATA_CAPABILITY_VERSION = "capabilityVersion"
+const val EMBEDDING_METADATA_CAPABILITY_DESCRIPTION = "capabilityDescription"
+
 @Component
 class DocumentHandler(
     private val ingestor: EmbeddingStoreIngestor,
@@ -22,27 +28,28 @@ class DocumentHandler(
     private val logger = LoggerFactory.getLogger(DocumentHandler::class.java)
 
     fun embedDocuments() {
-        logger.info("Start to read documents from path: ${embeddingDocumentProperties.documentPath}")
+        val embeddings = mutableListOf<Document>()
         loadJsonFilesAsChannelRoutings(embeddingDocumentProperties.documentPath).forEach { channelRouting ->
             channelRouting.capabilityGroups.forEach { group ->
                 group.capabilities.forEach { capability ->
                     capability.examples.forEach { example ->
                         val metadata = Metadata.from(
                             mapOf(
-                                "agentId" to group.id,
-                                "capabilityId" to capability.id,
-                                "capabilityName" to capability.name,
-                                "capabilityVersion" to capability.version,
-                                "capabilityDescription" to capability.description,
+                                EMBEDDING_METADATA_AGENT_ID to group.id,
+                                EMBEDDING_METADATA_CAPABILITY_ID to capability.id,
+                                EMBEDDING_METADATA_CAPABILITY_NAME to capability.name,
+                                EMBEDDING_METADATA_CAPABILITY_VERSION to capability.version,
+                                EMBEDDING_METADATA_CAPABILITY_DESCRIPTION to capability.description,
                             )
                         )
-                        logger.info("Embedding example '$example' from ${group.id}/${capability.id}")
-                        ingestor.ingest(Document.document(example, metadata))
+                        embeddings.add(Document.document(example, metadata))
                     }
                 }
             }
         }
-        logger.info("Finished to read documents from path: ${embeddingDocumentProperties.documentPath}")
+        logger.info("Start to create ${embeddings.size} embeddings for the documents from: ${embeddingDocumentProperties.documentPath}")
+        if (embeddings.isNotEmpty()) ingestor.ingest(embeddings)
+        logger.info("Created ${embeddings.size} embeddings for the documents from: ${embeddingDocumentProperties.documentPath}")
     }
 
     fun deleteAllDocuments() {

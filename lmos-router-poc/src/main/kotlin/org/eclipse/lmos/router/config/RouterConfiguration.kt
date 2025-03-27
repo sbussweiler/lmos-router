@@ -24,6 +24,7 @@ import io.qdrant.client.QdrantClient
 import io.qdrant.client.QdrantGrpcClient
 import io.qdrant.client.grpc.Collections.Distance
 import io.qdrant.client.grpc.Collections.VectorParams
+import org.eclipse.lmos.router.embeddings.*
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -100,18 +101,18 @@ class RouterConfiguration {
     ): ContentRetriever = EmbeddingStoreContentRetriever.builder()
         .embeddingModel(embeddingModel)
         .embeddingStore(embeddingStore)
-        .maxResults(3)
+        .maxResults(10)
         .build()
 
     @Bean
     fun contentInjector(): ContentInjector = DefaultContentInjector.builder()
         .metadataKeysToInclude(
             listOf(
-                "agentId",
-                "capabilityId",
-                "capabilityName",
-                "capabilityVersion",
-                "capabilityDescription"
+                EMBEDDING_METADATA_AGENT_ID,
+                EMBEDDING_METADATA_CAPABILITY_ID,
+                EMBEDDING_METADATA_CAPABILITY_NAME,
+                EMBEDDING_METADATA_CAPABILITY_VERSION,
+                EMBEDDING_METADATA_CAPABILITY_DESCRIPTION
             )
         )
         .build()

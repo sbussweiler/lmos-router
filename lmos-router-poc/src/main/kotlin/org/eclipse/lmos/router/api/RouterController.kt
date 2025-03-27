@@ -2,11 +2,15 @@ package org.eclipse.lmos.router.api
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import dev.langchain4j.rag.content.ContentMetadata
 import dev.langchain4j.rag.content.retriever.ContentRetriever
 import dev.langchain4j.rag.query.Query
-import org.eclipse.lmos.router.Agent
 import org.eclipse.lmos.router.Router
 import org.eclipse.lmos.router.RoutingResult
+import org.eclipse.lmos.router.embeddings.EMBEDDING_METADATA_AGENT_ID
+import org.eclipse.lmos.router.embeddings.EMBEDDING_METADATA_CAPABILITY_DESCRIPTION
+import org.eclipse.lmos.router.embeddings.EMBEDDING_METADATA_CAPABILITY_ID
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -20,29 +24,31 @@ class RouterController(
     private val retriever: ContentRetriever
 ) {
 
+    val logger = LoggerFactory.getLogger(RouterController::class.java)
+
     @PostMapping("/llms")
-    fun routeWithLLM(@RequestBody userQuery: UserQuery): RoutingResult {
+    fun routeByLLM(@RequestBody userQuery: UserQuery): RoutingResult {
+        logger.info("Route user query '${userQuery.query}' by LLM.")
         return routerService.route(userQuery.query)
     }
 
     @PostMapping("/embeddings")
-    fun routeWithEmbedding(@RequestBody userQuery: UserQuery): RoutingResult {
-        val agentCapabilities = mutableMapOf<String, MutableSet<String>>()
+    fun routeByEmbeddings(@RequestBody userQuery: UserQuery): Set<Embedding> {
+        logger.info("Route user query '${userQuery.query}' by embeddings.")
+        val embeddings = mutableSetOf<Embedding>()
         val contentList = retriever.retrieve(Query(userQuery.query))
         contentList.forEach { content ->
-            val agentId = content.textSegment().metadata().getString("agentId")
-            val capabilityId = content.textSegment().metadata().getString("capabilityId")
+            val example = content.textSegment().text()
+            val score = content.metadata()[ContentMetadata.SCORE]
+            val agentId = content.textSegment().metadata().getString(EMBEDDING_METADATA_AGENT_ID)
+            val capabilityId = content.textSegment().metadata().getString(EMBEDDING_METADATA_CAPABILITY_ID)
+            val capabilityDescription = content.textSegment().metadata().getString(EMBEDDING_METADATA_CAPABILITY_DESCRIPTION)
 
-            if (agentId != null && capabilityId != null) {
-                agentCapabilities.computeIfAbsent(agentId) { mutableSetOf() }.add(capabilityId)
+            if (agentId != null && capabilityId != null && capabilityDescription != null && score != null) {
+                embeddings.add(Embedding(example, score, agentId, capabilityId, capabilityDescription))
             }
         }
-
-        val agents = agentCapabilities.map { (name, capabilities) ->
-            Agent(name, capabilities.toList())
-        }
-
-        return RoutingResult(agents)
+        return embeddings
     }
 
     @PostMapping("/embeddings/plain")
@@ -55,4 +61,12 @@ class RouterController(
 
 data class UserQuery @JsonCreator constructor(
     @JsonProperty("query") val query: String
+)
+
+data class Embedding(
+    val example: String,
+    val score: Any,
+    val agentId: String,
+    val capabilityId: String,
+    val capabilityDescription: String,
 )
