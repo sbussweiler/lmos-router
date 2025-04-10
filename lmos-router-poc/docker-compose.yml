@@ -1,10 +1,9 @@
-version: '3.8'
-
 services:
   lmos-router-poc:
     image: ghcr.io/sbussweiler/lmos-router-poc:0.1.0-SNAPSHOT
     container_name: lmos-router-poc
     environment:
+      JAVA_TOOL_OPTIONS: "-XX:MaxDirectMemorySize=1G"
       EMBEDDING_STORE_IN_MEMORY_ENABLED: "false"
       EMBEDDING_STORE_HOST: "qdrant"
       EMBEDDING_STORE_PORT: "6334"
