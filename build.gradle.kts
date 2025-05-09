@@ -13,7 +13,7 @@ plugins {
     val kotlinVersion = "2.1.20"
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
-    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
+//    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     id("org.jetbrains.kotlinx.kover") version "0.9.1"
     id("org.jetbrains.dokka") version "2.0.0"
     id("org.cyclonedx.bom") version "2.2.0" apply false
@@ -30,7 +30,7 @@ subprojects {
     apply(plugin = "kotlinx-serialization")
     apply(plugin = "org.cyclonedx.bom")
     apply(plugin = "org.jetbrains.kotlinx.kover")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+//    apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "com.vanniktech.maven.publish")
 

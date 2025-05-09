@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+# The following setting allows overlapping bean definitions, because this demo project includes
+# all three spring boot starters (LLM, Vector, and Hybrid) to demonstrate various routing strategies.
+# In a realistic scenario, only one routing approach should be selected.
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+langchain4j:
+  azure-open-ai:
+    chat-model:
+      api-key: ${AZURE_OPENAI_API_KEY:your-api-key}
+      endpoint: ${AZURE_OPENAI_ENDPOINT:https://your-subdomain.openai.azure.com}
+      deployment-name: ${AZURE_OPENAI_MODEL_NAME:GPT35T-1106}
+      log-requests-and-responses: true
+
+lmos:
+  router:
+    llm:
+      maxChatHistory: ${LLM_MAX_CHAT_HISTORY:10}
+      system-prompt: ${LLM_SYSTEM_PROMPT}
+    embedding:
+      store:
+        host: ${EMBEDDING_STORE_HOST:localhost}
+        port: ${EMBEDDING_STORE_PORT:6334}
+      ranking:
+        maxEmbeddings: ${EMBEDDING_RANKING_MAX_EMBEDDINGS:15}
+        minWeight: ${EMBEDDING_RANKING_MIN_WEIGHT:5.0}
+        minDistance: ${EMBEDDING_RANKING_MIN_DISTANCE:4.0}
+        minMeanScore: ${EMBEDDING_RANKING_MIN_MEAN_SCORE:0.8}
+        minRealDistance: ${EMBEDDING_RANKING_MIN_REAL_DISTANCE:0.3}
+      model:
+        document-path: ${EMBEDDING_MODEL_DOCUMENT_PATH:/path/to/your/capabilities/directory}
+        local:
+          enabled: ${EMBEDDING_MODEL_LOCAL_ENABLED:true}
+          model-path: ${EMBEDDING_MODEL_LOCAL_MODEL_PATH:/path/to/your/local/model.onnx}
+          tokenizer-path: ${EMBEDDING_MODEL_LOCAL_TOKENIZER_PATH:/path/to/your/local/tokenizer.json}
+        huggingface:
+          enabled: ${EMBEDDING_MODEL_HUGGINGFACE_ENABLED:false}
+          model-name: ${EMBEDDING_MODEL_HUGGINGFACE_MODEL_NAME:mixedbread-ai/deepset-mxbai-embed-de-large-v1}
+          api-key: ${EMBEDDING_MODEL_HUGGINGFACE_API_KEY:your-api-key}

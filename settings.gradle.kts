@@ -7,12 +7,13 @@ plugins {
 }
 
 rootProject.name = "org.eclipse.lmos-router"
-include("lmos-router-core")
-include("lmos-router-llm")
-include("lmos-router-llm-spring-boot-starter")
-include("lmos-router-vector")
-include("lmos-router-vector-spring-boot-starter")
-include("lmos-router-llm-in-spring-cloud-gateway-demo")
-include("benchmarks")
-include("lmos-router-hybrid")
-include("lmos-router-hybrid-spring-boot-starter")
+include("lmos-routing-core")
+include("lmos-routing-llm")
+include("lmos-routing-llm-spring-boot-starter")
+include("lmos-routing-vector")
+include("lmos-routing-vector-spring-boot-starter")
+include("lmos-routing-hybrid")
+include("lmos-routing-hybrid-spring-boot-starter")
+include("lmos-routing-workbench-demo-controller")
+include("lmos-routing-workbench-demo-supervisor-agent")
+include("lmos-routing-core-spring-boot-starter")
