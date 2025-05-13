@@ -29,19 +29,17 @@ services:
       # LLM History settings
       LLM_MAX_CHAT_HISTORY: "${LLM_MAX_CHAT_HISTORY}"
       LLM_SYSTEM_PROMPT: >
-        Your task is to forward incoming chat messages to the right Agent, if an assessment is possible.
-
-        The following Agents are available to handle the customer conversation mentioned below:
+        Die folgenden Agenten stehen zur Bearbeitung der weiter unten genannten Kundenkonversation zur Verfügung:
         {{agents}}
 
-        Please select the correct agent for the customer and return the given 'agentId'.
-        Sample response:
+        Bitte wähle den richtigen Agenten für den Kunden aus und liefere die agentId zurück.
+        Beispielantwort:
         {
             "agentId": "<given-agent-id>"
         }
 
-        If no suitable agent can be selected, return 'null' as agentId.
-        Sample response:
+        Wenn kein geeigneter Agent ausgewählt werden kann, gebe 'null' als Agenten-ID zurück.
+        Beispielantwort:
         {
             "agentId": null
         }
