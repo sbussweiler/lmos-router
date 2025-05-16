@@ -34,6 +34,7 @@ class QdrantEmbeddingRetriever(
             .host(qdrantHost)
             .port(qdrantPort)
             .collectionName(tenant)
+            .payloadTextKey(EMBEDDING_METADATA_CAPABILITY_EXAMPLE)
             .build()
 
         val contentRetriever = EmbeddingStoreContentRetriever.builder()

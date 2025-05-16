@@ -1,8 +1,12 @@
 package org.eclipse.lmos.routing.vector.starter
 
+import dev.langchain4j.model.embedding.EmbeddingModel
+import org.eclipse.lmos.routing.core.semantic.EmbeddingHandler
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
 import org.eclipse.lmos.routing.core.starter.EmbeddingRankingProperties
+import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
 import org.eclipse.lmos.routing.vector.EmbeddingVectorRouter
+import org.eclipse.lmos.routing.vector.injector.QdrantEmbeddingHandler
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -15,6 +19,16 @@ import org.springframework.context.annotation.Configuration
     EmbeddingRankingProperties::class
 )
 open class EmbeddingRouterAutoConfiguration {
+
+    @Bean
+    open fun embeddingHandler(
+        embeddingModel: EmbeddingModel,
+        embeddingStoreProperties: EmbeddingStoreProperties,
+    ): EmbeddingHandler = QdrantEmbeddingHandler.builder()
+        .withEmbeddingModel(embeddingModel)
+        .withQdrantHost(embeddingStoreProperties.host)
+        .withQdrantPort(embeddingStoreProperties.port)
+        .build()
 
     @Bean
     open fun vectorRouter(

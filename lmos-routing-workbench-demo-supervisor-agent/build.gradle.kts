@@ -36,6 +36,7 @@ dependencies {
     implementation("org.eclipse.lmos:arc-graphql-spring-boot-starter:$arcVersion")
 
     implementation(project(":lmos-routing-llm-spring-boot-starter"))
+    implementation(project(":lmos-routing-vector-spring-boot-starter"))
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
     implementation("dev.langchain4j:langchain4j-qdrant:1.0.0-beta1")

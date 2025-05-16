@@ -1,7 +1,5 @@
 package org.eclipse.lmos.router.api
 
-import dev.langchain4j.data.segment.TextSegment
-import dev.langchain4j.store.embedding.EmbeddingStore
 import org.eclipse.lmos.router.embeddings.DocumentHandler
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -9,18 +7,17 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/embeddings", produces = [MediaType.APPLICATION_JSON_VALUE])
 class DocumentController(
-    private val documentReader: DocumentHandler,
-    private val embeddingStore: EmbeddingStore<TextSegment>
+    private val documentHandler: DocumentHandler
 ) {
 
     @PostMapping
-    fun embedDocuments(@RequestParam(defaultValue = "telekom") tenant: String) {
-        documentReader.embedDocuments(tenant)
+    fun ingestDocuments(@RequestParam(defaultValue = "telekom") tenant: String) {
+        documentHandler.ingestDocuments(tenant)
     }
 
     @DeleteMapping
-    fun deleteAllDocuments() {
-        embeddingStore.removeAll()
+    fun removeDocuments(@RequestParam(defaultValue = "telekom") tenant: String) {
+        documentHandler.removeDocuments(tenant)
     }
 
 }

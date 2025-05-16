@@ -5,21 +5,25 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.eclipse.lmos.router.config.EmbeddingDocumentProperties
 import org.eclipse.lmos.routing.core.semantic.*
 import org.slf4j.LoggerFactory
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
 import java.io.File
 
 @Component
+@Configuration
+@EnableConfigurationProperties(EmbeddingDocumentProperties::class)
 class DocumentHandler(
-    private val embeddingInjector: EmbeddingInjector,
+    private val embeddingHandler: EmbeddingHandler,
     private val embeddingDocumentProperties: EmbeddingDocumentProperties
 ) {
 
     private val logger = LoggerFactory.getLogger(DocumentHandler::class.java)
 
-    fun embedDocuments(tenant: String) {
+    fun ingestDocuments(tenant: String) {
         val channelRoutings = loadJsonFilesAsChannelRoutings(embeddingDocumentProperties.documentPath)
         val groups = channelRoutings.flatMap { it.capabilityGroups }
-        embeddingInjector.ingest(tenant, groups)
+        embeddingHandler.ingest(tenant, groups)
     }
 
     private fun loadJsonFilesAsChannelRoutings(directoryPath: String): List<ChannelRouting> {
@@ -35,6 +39,10 @@ class DocumentHandler(
                     logger.info("Successfully parsed file: ${file.name}")
                 }.getOrNull()
             } ?: emptyList()
+    }
+
+    fun removeDocuments(tenant: String) {
+        embeddingHandler.remove(tenant)
     }
 
 }

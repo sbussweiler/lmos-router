@@ -11,6 +11,7 @@ import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore
 import org.eclipse.lmos.routing.core.llm.ChatModelRouter
 import org.eclipse.lmos.routing.core.llm.RagChatModelRouter
+import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_CAPABILITY_EXAMPLE
 import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
 import org.eclipse.lmos.routing.llm.DefaultChatModelRouter
 import org.eclipse.lmos.routing.llm.DefaultRagChatModelRouter
@@ -54,6 +55,7 @@ open class ChatModelRouterAutoConfiguration {
             .host(embeddingStoreProperties.host)
             .port(embeddingStoreProperties.port)
             .collectionName(embeddingStoreProperties.collection)
+            .payloadTextKey(EMBEDDING_METADATA_CAPABILITY_EXAMPLE)
             .build()
         return embeddingStore
     }

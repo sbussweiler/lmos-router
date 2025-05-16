@@ -37,9 +37,9 @@ interface EmbeddingRanker {
 }
 
 /**
- * [EmbeddingInjector] ingests capabilities into an embedding store.
+ * [EmbeddingHandler] handles capabilities for a tenant in an embedding store.
  */
-interface EmbeddingInjector {
+interface EmbeddingHandler {
     /**
      * Ingests capability groups into the embedding store for a given tenant.
      *
@@ -47,6 +47,13 @@ interface EmbeddingInjector {
      * @param groups The capability groups to ingest.
      */
     fun ingest(tenant: String, groups: List<CapabilityGroup>)
+
+    /**
+     * Removes all capabilities from the embedding store for a given tenant.
+     *
+     * @param tenant The tenant identifier.
+     */
+    fun remove(tenant: String)
 }
 
 /**

@@ -6,4 +6,6 @@ dependencies {
 
     implementation("dev.langchain4j:langchain4j-qdrant:1.0.0-beta1")
 
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+
 }

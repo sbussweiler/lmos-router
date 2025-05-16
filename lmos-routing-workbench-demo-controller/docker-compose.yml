@@ -2,6 +2,7 @@ services:
   lmos-router-poc:
     image: ghcr.io/sbussweiler/lmos-router-poc:0.1.0-SNAPSHOT
     container_name: lmos-router-poc
+    pull_policy: always
     environment:
       # Increase the direct memory size, otherwise the embedding creation will end up with OOM
       JAVA_TOOL_OPTIONS: "-XX:MaxDirectMemorySize=1G"
@@ -46,6 +47,7 @@ services:
     volumes:
       - "${CAPABILITIES_DOCUMENTS_DIR}:/app/documents"
       - "${EMBEDDING_MODEL_LOCAL_DIR}:/app/model"
+      - "~/.azure:/home/router/.azure"
     ports:
       - "8080:8080"
     depends_on:
