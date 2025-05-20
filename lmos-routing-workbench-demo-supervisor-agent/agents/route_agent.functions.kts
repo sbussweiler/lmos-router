@@ -12,6 +12,6 @@ function(
     )
 ) { (query) ->
     val router = get<RagChatModelRouter>()
-    val routingResult = router.resolveAgent(query.toString(), "telekom", "conversationId")
+    val routingResult = router.resolveAgent(query.toString(), "arc-supervisor", "conversationId")
     "${routingResult.agentId}"
 }

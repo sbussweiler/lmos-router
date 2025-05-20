@@ -1,18 +1,14 @@
 package org.eclipse.lmos.routing.hybrid.starter
 
-import ChatModelProperties
+import LangChainClientProvider.LangChainChatModelFactory
+import LangChainClientProvider.ModelClientProperties
 import dev.langchain4j.model.chat.ChatLanguageModel
-import dev.langchain4j.model.chat.listener.ChatModelErrorContext
-import dev.langchain4j.model.chat.listener.ChatModelListener
-import dev.langchain4j.model.chat.listener.ChatModelRequestContext
-import dev.langchain4j.model.chat.listener.ChatModelResponseContext
 import org.eclipse.lmos.routing.core.hybrid.HybridRouter
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
 import org.eclipse.lmos.routing.core.starter.EmbeddingRankingProperties
 import org.eclipse.lmos.routing.hybrid.DefaultHybridRouter
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
-import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,6 +22,20 @@ import org.springframework.context.annotation.Configuration
 open class HybridRouterAutoConfiguration {
 
     @Bean
+    open fun chatModel(chatModelProperties: ChatModelProperties): ChatLanguageModel =
+        LangChainChatModelFactory.createClient(
+            ModelClientProperties(
+                provider = chatModelProperties.provider,
+                apiKey = chatModelProperties.apiKey,
+                baseUrl = chatModelProperties.baseUrl,
+                model = chatModelProperties.model,
+                maxTokens = chatModelProperties.maxTokens,
+                temperature = chatModelProperties.temperature,
+                logRequestsAndResponses = chatModelProperties.logRequestsAndResponses,
+            )
+        )
+
+    @Bean
     open fun hybridRouter(
         chatModel: ChatLanguageModel,
         chatModelProperties: ChatModelProperties,
@@ -33,8 +43,8 @@ open class HybridRouterAutoConfiguration {
         embeddingRankingProperties: EmbeddingRankingProperties,
     ): HybridRouter = DefaultHybridRouter.builder()
         .withChatModel(chatModel)
-        .withLlmSystemPrompt(chatModelProperties.systemPrompt)
-        .withLlmMaxChatMemory(chatModelProperties.maxChatHistory)
+        .withSystemPrompt(chatModelProperties.systemPrompt)
+        .withMaxMemoryMessages(chatModelProperties.maxChatHistory)
         .withEmbeddingRetriever(embeddingRetriever)
         .withEmbeddingRanker(
             EmbeddingScoreRanker(
@@ -48,24 +58,4 @@ open class HybridRouterAutoConfiguration {
         )
         .build()
 
-    @Bean
-    open fun chatModelConversationListener(): ChatModelListener = ModelConversationLogger()
-
-}
-
-class ModelConversationLogger : ChatModelListener {
-
-    private val logger = LoggerFactory.getLogger(ChatModelListener::class.java)
-
-    override fun onRequest(requestContext: ChatModelRequestContext) {
-        logger.info("onRequest(): {}", requestContext.chatRequest())
-    }
-
-    override fun onResponse(responseContext: ChatModelResponseContext) {
-        logger.info("onResponse(): {}", responseContext.chatResponse())
-    }
-
-    override fun onError(errorContext: ChatModelErrorContext) {
-        logger.info("onError(): {}", errorContext.error().message)
-    }
 }

@@ -22,9 +22,9 @@ Prepare your environment by setting the required environment variables in the `.
 - `EMBEDDING_MODEL_HUGGINGFACE_MODEL_NAME` - The name of the Hugging Face model.
 - `EMBEDDING_MODEL_HUGGINGFACE_API_KEY` - The API key for the Hugging Face model.
 #### Azure OpenAI Settings
-- `AZURE_OPENAI_ENDPOINT` - Your Azure OpenAI endpoint.
-- `AZURE_OPENAI_API_KEY` - Your Azure OpenAI API key.
-- `AZURE_OPENAI_MODEL_NAME` - Your Azure OpenAI model name.
+- `LLM_BASE_URL` - The base url to the LLM endpoint.
+- `LLM_API_KEY` - The LLM api key.
+- `LLM_MODEL_NAME` - THe LLM model name.
 #### LLM History settings
 - `LLM_MAX_CHAT_HISTORY` - The maximum number of chat history messages to be used in the LLM prompt.
 

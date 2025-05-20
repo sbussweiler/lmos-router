@@ -8,17 +8,13 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
-langchain4j:
-  azure-open-ai:
-    chat-model:
-      api-key: ${AZURE_OPENAI_API_KEY:your-api-key}
-      endpoint: ${AZURE_OPENAI_ENDPOINT:https://your-subdomain.openai.azure.com}
-      deployment-name: ${AZURE_OPENAI_MODEL_NAME:GPT35T-1106}
-      log-requests-and-responses: true
-
 lmos:
   router:
     llm:
+      provider: ${LLM_PROVIDER:azure_openai}
+      api-key: ${LLM_API_KEY:your-api-key}
+      base-url: ${LLM_BASE_URL:https://your-subdomain.openai.azure.com}
+      model: ${LLM_MODEL_NAME:your-model}
       maxChatHistory: ${LLM_MAX_CHAT_HISTORY:10}
       system-prompt: ${LLM_SYSTEM_PROMPT}
     embedding:

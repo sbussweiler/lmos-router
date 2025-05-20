@@ -1,4 +1,4 @@
-package org.eclipse.lmos.routing.hybrid.starter
+package org.eclipse.lmos.routing.llm.starter
 
 import org.eclipse.lmos.routing.llm.defaultSystemPrompt
 import org.springframework.boot.context.properties.ConfigurationProperties

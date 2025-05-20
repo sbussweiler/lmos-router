@@ -31,7 +31,7 @@ class QdrantEmbeddingHandler(
     )
 
     override fun ingest(tenant: String, groups: List<CapabilityGroup>) {
-        logger.info("Start ingesting embeddings into the 'telekom' collection for the following agents: ${groups.map { it.id }}.")
+        logger.info("Start ingesting embeddings into the '$tenant' collection for the following agents: ${groups.map { it.id }}.")
         groups.forEach {
             try {
                 ingest(tenant, it)

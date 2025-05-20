@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class EmbeddingStoreProperties(
     val host: String,
     val port: Int,
-    // TODO only required for LLM-RAQ based approach, will be replaced with "dynamic collections".
+    // TODO: only required for LLM-RAQ based approach, will be replaced with "dynamic collections".
     val collection: String = "telekom"
 )
 

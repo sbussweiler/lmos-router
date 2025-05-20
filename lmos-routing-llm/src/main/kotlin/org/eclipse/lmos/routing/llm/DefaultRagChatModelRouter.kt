@@ -21,7 +21,7 @@ class DefaultRagChatModelRouter(
     private val langchainAIService: LangchainRagLlmAgentResolver
 ) : RagChatModelRouter {
 
-    override fun resolveAgent(@UserMessage query: String, tenant: String, @MemoryId conversationId: String):ChatModelRoutingResult {
+    override fun resolveAgent(query: String, tenant: String, conversationId: String):ChatModelRoutingResult {
         return langchainAIService.resolveAgent(query, conversationId)
     }
 

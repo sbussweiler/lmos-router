@@ -55,11 +55,11 @@ class HybridRouterBuilder {
         this.llm = model
     }
 
-    fun withLlmSystemPrompt(systemPrompt: String) = apply {
+    fun withSystemPrompt(systemPrompt: String) = apply {
         this.llmSystemPrompt = systemPrompt
     }
 
-    fun withLlmMaxChatMemory(llmMaxChatMemory: Int) = apply {
+    fun withMaxMemoryMessages(llmMaxChatMemory: Int) = apply {
         this.llmMaxChatMemory = llmMaxChatMemory
     }
 
