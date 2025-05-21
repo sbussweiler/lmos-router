@@ -1,5 +1,6 @@
 package org.eclipse.lmos.routing.vector
 
+import org.eclipse.lmos.routing.core.EmbeddingRoutingRequest
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRouter
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRanker
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
@@ -14,8 +15,8 @@ class EmbeddingVectorRouter(
     private val embeddingRanker: EmbeddingRanker
 ) : EmbeddingRouter {
 
-    override fun resolveAgent(query: String, tenant: String): EmbeddingRoutingResult {
-        val embeddings = embeddingRetriever.retrieve(tenant, query)
+    override fun resolveAgent(routingRequest: EmbeddingRoutingRequest): EmbeddingRoutingResult {
+        val embeddings = embeddingRetriever.retrieve(routingRequest.tenant, routingRequest.query)
         val qualifiedAgent = embeddingRanker.findQualifiedAgent(embeddings)
         return EmbeddingRoutingResult(
             qualifiedAgent.agentId,

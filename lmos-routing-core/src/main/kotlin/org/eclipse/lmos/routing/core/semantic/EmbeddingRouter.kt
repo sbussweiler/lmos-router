@@ -3,6 +3,7 @@ package org.eclipse.lmos.routing.core.semantic
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.eclipse.lmos.routing.core.EmbeddingRoutingRequest
 import org.eclipse.lmos.routing.core.Router
 import org.eclipse.lmos.routing.core.llm.Agent
 
@@ -17,7 +18,7 @@ interface EmbeddingRouter : Router {
      * @param tenant The tenant or domain identifier.
      * @return An [EmbeddingRoutingResult] containing the best-matching agent.
      */
-    fun resolveAgent(query: String, tenant: String): EmbeddingRoutingResult
+    fun resolveAgent(routingRequest: EmbeddingRoutingRequest): EmbeddingRoutingResult
 }
 
 

@@ -3,11 +3,11 @@ package LangChainClientProvider
 import com.azure.identity.DefaultAzureCredentialBuilder
 import dev.langchain4j.model.anthropic.AnthropicChatModel
 import dev.langchain4j.model.azure.AzureOpenAiChatModel
-import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel.OpenAiChatModelBuilder
 import LangChainClientProvider.LangChainClientProvider.*
+import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.listener.ChatModelErrorContext
 import dev.langchain4j.model.chat.listener.ChatModelListener
 import dev.langchain4j.model.chat.listener.ChatModelRequestContext
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
  */
 class LangChainChatModelFactory private constructor() {
     companion object {
-        fun createClient(properties: ModelClientProperties): ChatLanguageModel {
+        fun createClient(properties: ModelClientProperties): ChatModel {
             return when (properties.provider) {
                 OPENAI.name.lowercase(),
                     -> {

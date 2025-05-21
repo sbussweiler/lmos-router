@@ -2,6 +2,9 @@ package org.eclipse.lmos.router.api
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.eclipse.lmos.routing.core.ChatModelRoutingRequest
+import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
+import org.eclipse.lmos.routing.core.EmbeddingRoutingRequest
 import org.eclipse.lmos.routing.core.hybrid.HybridRouter
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
 import org.eclipse.lmos.routing.core.semantic.TenantNotSupportedException
@@ -37,20 +40,37 @@ class RouterController(
     fun routeByLLM(@RequestBody userQuery: UserAgentQuery): ChatModelRoutingResult {
         logger.info("Route user query '${userQuery.query}' by LLM.")
         val conversationId = userQuery.conversationId ?: "default"
-        return llmRouter.resolveAgent(userQuery.query, userQuery.agents, conversationId)
+        return llmRouter.resolveAgent(
+            ChatModelRoutingRequest(
+                userQuery.query,
+                userQuery.agents,
+                conversationId
+            )
+        )
     }
 
     @PostMapping("/rag-llm")
     fun routeByRagLLM(@RequestBody userQuery: UserRequest): ChatModelRoutingResult {
         logger.info("Route user query '${userQuery.query}' by RagLLM.")
         val conversationId = userQuery.conversationId ?: "default"
-        return ragRouter.resolveAgent(userQuery.query, userQuery.tenant, conversationId)
+        return ragRouter.resolveAgent(
+            EmbeddingChatModelRoutingRequest(
+                userQuery.query,
+                userQuery.tenant,
+                conversationId
+            )
+        )
     }
 
     @PostMapping("/vector")
     fun vectorRouting(@RequestBody userQuery: UserRequest): EmbeddingRoutingResult {
         logger.info("Perform vector routing for ${userQuery.tenant} and user query '${userQuery.query}'.")
-        return vectorRouter.resolveAgent(userQuery.query, userQuery.tenant)
+        return vectorRouter.resolveAgent(
+            EmbeddingRoutingRequest(
+                userQuery.query,
+                userQuery.tenant
+            )
+        )
     }
 
     @PostMapping("/vector/plain")
@@ -63,7 +83,13 @@ class RouterController(
     fun routeHybrid(@RequestBody userQuery: UserRequest): EmbeddingRoutingResult {
         logger.info("Route user query '${userQuery.query}' by embeddings.")
         val conversationId = userQuery.conversationId ?: "default"
-        return hybridRouter.resolveAgent(userQuery.query, userQuery.tenant, conversationId)
+        return hybridRouter.resolveAgent(
+            EmbeddingChatModelRoutingRequest(
+                userQuery.query,
+                userQuery.tenant,
+                conversationId
+            )
+        )
     }
 
     @ExceptionHandler(TenantNotSupportedException::class)

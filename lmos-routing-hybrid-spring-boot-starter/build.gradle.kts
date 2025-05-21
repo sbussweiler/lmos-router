@@ -1,4 +1,4 @@
-val springBootVersion: String by rootProject.extra
+val springBootVersion: String by project
 
 dependencies {
     api(project(":lmos-routing-hybrid"))

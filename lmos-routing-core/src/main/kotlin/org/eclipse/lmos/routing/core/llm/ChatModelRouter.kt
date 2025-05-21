@@ -2,6 +2,8 @@ package org.eclipse.lmos.routing.core.llm
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.eclipse.lmos.routing.core.ChatModelRoutingRequest
+import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
 import org.eclipse.lmos.routing.core.Router
 
 /**
@@ -16,14 +18,14 @@ interface ChatModelRouter : Router {
      * @param conversationId The conversation context ID.
      * @return A [ChatModelRoutingResult] containing the selected agent.
      */
-    fun resolveAgent(query: String, agents: List<Agent>, conversationId: String): ChatModelRoutingResult
+    fun resolveAgent(routingRequest: ChatModelRoutingRequest): ChatModelRoutingResult
 }
 
 /**
  * [RagChatModelRouter] performs agent routing using an LLM + RAG
  */
 interface RagChatModelRouter : Router {
-    fun resolveAgent(query: String, tenant: String, conversationId: String): ChatModelRoutingResult
+    fun resolveAgent(routingRequest: EmbeddingChatModelRoutingRequest): ChatModelRoutingResult
 }
 
 data class Agent @JsonCreator constructor(

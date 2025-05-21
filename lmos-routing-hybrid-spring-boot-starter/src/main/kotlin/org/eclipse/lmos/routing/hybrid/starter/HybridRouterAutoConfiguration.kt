@@ -2,7 +2,7 @@ package org.eclipse.lmos.routing.hybrid.starter
 
 import LangChainClientProvider.LangChainChatModelFactory
 import LangChainClientProvider.ModelClientProperties
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
 import org.eclipse.lmos.routing.core.hybrid.HybridRouter
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
 import org.eclipse.lmos.routing.core.starter.EmbeddingRankingProperties
@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration
 open class HybridRouterAutoConfiguration {
 
     @Bean
-    open fun chatModel(chatModelProperties: ChatModelProperties): ChatLanguageModel =
+    open fun chatModel(chatModelProperties: ChatModelProperties): ChatModel =
         LangChainChatModelFactory.createClient(
             ModelClientProperties(
                 provider = chatModelProperties.provider,
@@ -37,7 +37,7 @@ open class HybridRouterAutoConfiguration {
 
     @Bean
     open fun hybridRouter(
-        chatModel: ChatLanguageModel,
+        chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
         embeddingRetriever: EmbeddingRetriever,
         embeddingRankingProperties: EmbeddingRankingProperties,

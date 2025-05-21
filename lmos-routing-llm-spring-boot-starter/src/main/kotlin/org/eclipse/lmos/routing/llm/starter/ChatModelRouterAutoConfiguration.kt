@@ -3,7 +3,7 @@ package org.eclipse.lmos.routing.llm.starter
 import LangChainClientProvider.LangChainChatModelFactory
 import LangChainClientProvider.ModelClientProperties
 import dev.langchain4j.data.segment.TextSegment
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore
@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean
 open class ChatModelRouterAutoConfiguration {
 
     @Bean
-    open fun chatModel(chatModelProperties: ChatModelProperties): ChatLanguageModel =
+    open fun chatModel(chatModelProperties: ChatModelProperties): ChatModel =
         LangChainChatModelFactory.createClient(
             ModelClientProperties(
                 provider = chatModelProperties.provider,
@@ -40,7 +40,7 @@ open class ChatModelRouterAutoConfiguration {
 
     @Bean
     open fun llmRouter(
-        chatModel: ChatLanguageModel,
+        chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
     ): ChatModelRouter = DefaultChatModelRouter.builder()
         .withChatModel(chatModel)
@@ -50,7 +50,7 @@ open class ChatModelRouterAutoConfiguration {
 
     @Bean
     fun ragLlmRouter(
-        chatModel: ChatLanguageModel,
+        chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
         embeddingModel: EmbeddingModel,
         embeddingStore: EmbeddingStore<TextSegment>

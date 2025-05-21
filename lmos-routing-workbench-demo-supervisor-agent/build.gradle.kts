@@ -1,3 +1,7 @@
+val langChain4jCoreVersion: String by project
+val langChain4jModulesVersion: String by project
+val jacksonVersion: String by project
+
 plugins {
     val kotlinVersion = "2.1.20"
     kotlin("jvm") version kotlinVersion apply false
@@ -38,8 +42,7 @@ dependencies {
     implementation(project(":lmos-routing-llm-spring-boot-starter"))
     implementation(project(":lmos-routing-vector-spring-boot-starter"))
 
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
-    implementation("dev.langchain4j:langchain4j-qdrant:1.0.0-beta1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
     // Tracing
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
@@ -54,10 +57,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // Langchain4j
-    implementation("dev.langchain4j:langchain4j-bedrock:$langchain4jVersion")
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:$langchain4jVersion")
-    implementation("dev.langchain4j:langchain4j-ollama:$langchain4jVersion")
-    implementation("dev.langchain4j:langchain4j-open-ai:$langchain4jVersion")
+    implementation("dev.langchain4j:langchain4j-qdrant:$langChain4jModulesVersion")
+    implementation("dev.langchain4j:langchain4j-bedrock:$langChain4jModulesVersion")
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:$langChain4jModulesVersion")
+    implementation("dev.langchain4j:langchain4j-ollama:$langChain4jModulesVersion")
+    implementation("dev.langchain4j:langchain4j-open-ai:$langChain4jCoreVersion")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")

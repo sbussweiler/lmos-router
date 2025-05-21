@@ -8,6 +8,7 @@ plugins {
 
 rootProject.name = "org.eclipse.lmos-router"
 include("lmos-routing-core")
+include("lmos-routing-core-spring-boot-starter")
 include("lmos-routing-llm")
 include("lmos-routing-llm-spring-boot-starter")
 include("lmos-routing-vector")
@@ -16,4 +17,3 @@ include("lmos-routing-hybrid")
 include("lmos-routing-hybrid-spring-boot-starter")
 include("lmos-routing-workbench-demo-controller")
 include("lmos-routing-workbench-demo-supervisor-agent")
-include("lmos-routing-core-spring-boot-starter")

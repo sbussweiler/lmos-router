@@ -1,5 +1,6 @@
 package org.eclipse.lmos.routing.core.hybrid
 
+import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
 import org.eclipse.lmos.routing.core.Router
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRoutingResult
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRouter
@@ -18,5 +19,5 @@ interface HybridRouter : Router {
      * @param conversationId The conversation context ID.
      * @return An [EmbeddingRoutingResult] containing the resolved agent.
      */
-    fun resolveAgent(query: String, tenant: String, conversationId: String): EmbeddingRoutingResult
+    fun resolveAgent(routingRequest: EmbeddingChatModelRoutingRequest): EmbeddingRoutingResult
 }

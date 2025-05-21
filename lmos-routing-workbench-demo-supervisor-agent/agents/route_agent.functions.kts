@@ -1,4 +1,5 @@
 import org.eclipse.lmos.routing.core.llm.RagChatModelRouter
+import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
 
 // SPDX-FileCopyrightText: 2025 Deutsche Telekom AG and others
 //
@@ -12,6 +13,6 @@ function(
     )
 ) { (query) ->
     val router = get<RagChatModelRouter>()
-    val routingResult = router.resolveAgent(query.toString(), "arc-supervisor", "conversationId")
+    val routingResult = router.resolveAgent(EmbeddingChatModelRoutingRequest(query.toString(), "arc-supervisor", "conversationId"))
     "${routingResult.agentId}"
 }

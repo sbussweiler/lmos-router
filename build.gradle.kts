@@ -21,8 +21,6 @@ plugins {
     id("com.vanniktech.maven.publish") version "0.31.0"
 }
 
-val springBootVersion by extra { "3.3.5" }
-
 subprojects {
     group = "org.eclipse.lmos"
 

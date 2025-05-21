@@ -1,6 +1,9 @@
 package org.eclipse.lmos.routing.hybrid
 
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
+import org.eclipse.lmos.routing.core.ChatModelRoutingRequest
+import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
+import org.eclipse.lmos.routing.core.EmbeddingRoutingRequest
 import org.eclipse.lmos.routing.core.hybrid.HybridRouter
 import org.eclipse.lmos.routing.core.llm.ChatModelRouter
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRanker
@@ -21,18 +24,24 @@ class DefaultHybridRouter(
 
     private val logger = LoggerFactory.getLogger(DefaultHybridRouter::class.java)
 
-    override fun resolveAgent(query: String, tenant: String, conversationId: String): EmbeddingRoutingResult {
-        logger.info("HybridRouter trying to find agent for query '$query'")
-        val semanticRoutingResult = embeddingRouter.resolveAgent(query, tenant)
+    override fun resolveAgent(routingRequest: EmbeddingChatModelRoutingRequest): EmbeddingRoutingResult {
+        logger.info("HybridRouter trying to find agent for query '${routingRequest.query}'")
+        val semanticRoutingResult = embeddingRouter.resolveAgent(EmbeddingRoutingRequest(routingRequest.query, routingRequest.tenant))
         if (semanticRoutingResult.agentId.isNullOrEmpty()) {
-            logger.info("HybridRouter can not find agent using vector search, going to ask LLM for query '$query'")
-            val llmRoutingResult = llmRouter.resolveAgent(query, semanticRoutingResult.consideredAgents, conversationId)
+            logger.info("HybridRouter can not find agent using vector search, going to ask LLM for query '${routingRequest.query}'")
+            val llmRoutingResult = llmRouter.resolveAgent(
+                ChatModelRoutingRequest(
+                    routingRequest.query,
+                    semanticRoutingResult.consideredAgents,
+                    routingRequest.conversationId
+                )
+            )
             return EmbeddingRoutingResult(
                 agentId = llmRoutingResult.agentId,
                 consideredAgents = semanticRoutingResult.consideredAgents
             )
         }
-        logger.info("HybridRouter found agent for '$query': $semanticRoutingResult")
+        logger.info("HybridRouter found agent for '${routingRequest.query}': $semanticRoutingResult")
         return semanticRoutingResult
     }
 
@@ -45,13 +54,13 @@ class DefaultHybridRouter(
 }
 
 class HybridRouterBuilder {
-    private var llm: ChatLanguageModel? = null
+    private var llm: ChatModel? = null
     private var llmSystemPrompt: String = defaultSystemPrompt()
     private var llmMaxChatMemory: Int = 10
     private var embeddingRetriever: EmbeddingRetriever? = null
     private var embeddingRanker: EmbeddingRanker = EmbeddingScoreRanker(EmbeddingRankingThreshold())
 
-    fun withChatModel(model: ChatLanguageModel) = apply {
+    fun withChatModel(model: ChatModel) = apply {
         this.llm = model
     }
 
@@ -72,7 +81,7 @@ class HybridRouterBuilder {
     }
 
     fun build(): DefaultHybridRouter {
-        if (llm == null) throw IllegalStateException("ChatLanguageModel must be set")
+        if (llm == null) throw IllegalStateException("ChatModel must be set")
         if (embeddingRetriever == null) throw IllegalStateException("EmbeddingRetriever must be set")
 
         val vectorRouter = EmbeddingVectorRouter.builder()

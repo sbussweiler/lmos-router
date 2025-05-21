@@ -1,5 +1,7 @@
-import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
-import org.springframework.boot.gradle.tasks.bundling.BootJar
+val springBootVersion: String by project
+val langChain4jCoreVersion: String by project
+val langChain4jModulesVersion: String by project
+val jacksonVersion: String by project
 
 plugins {
     id("java")
@@ -15,11 +17,13 @@ dependencies {
     implementation(project(":lmos-routing-vector-spring-boot-starter"))
     implementation(project(":lmos-routing-hybrid-spring-boot-starter"))
 
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-web:3.4.3")
-    implementation("org.springframework.boot:spring-boot-gradle-plugin:3.2.2")
+    implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
 
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
 }
 
 tasks.test {

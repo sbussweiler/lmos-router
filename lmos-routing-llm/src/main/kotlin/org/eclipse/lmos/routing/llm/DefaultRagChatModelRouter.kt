@@ -2,7 +2,7 @@ package org.eclipse.lmos.routing.llm
 
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.rag.DefaultRetrievalAugmentor
 import dev.langchain4j.rag.content.Content
@@ -12,6 +12,7 @@ import dev.langchain4j.service.AiServices
 import dev.langchain4j.service.MemoryId
 import dev.langchain4j.service.UserMessage
 import dev.langchain4j.store.embedding.EmbeddingStore
+import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
 import org.eclipse.lmos.routing.core.llm.RagChatModelRouter
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_AGENT_ID
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_CAPABILITY_DESCRIPTION
@@ -21,8 +22,8 @@ class DefaultRagChatModelRouter(
     private val langchainAIService: LangchainRagLlmAgentResolver
 ) : RagChatModelRouter {
 
-    override fun resolveAgent(query: String, tenant: String, conversationId: String):ChatModelRoutingResult {
-        return langchainAIService.resolveAgent(query, conversationId)
+    override fun resolveAgent(routingRequest: EmbeddingChatModelRoutingRequest):ChatModelRoutingResult {
+        return langchainAIService.resolveAgent(routingRequest.query, routingRequest.conversationId)
     }
 
     companion object {
@@ -39,14 +40,14 @@ interface LangchainRagLlmAgentResolver {
 }
 
 class DefaultRagChatModelRouterBuilder {
-    private var llm: ChatLanguageModel? = null
+    private var llm: ChatModel? = null
     private var systemPrompt: String = defaultSystemPromptWithRaq()
     private var embeddingModel: EmbeddingModel? = null
     private var embeddingStore: EmbeddingStore<TextSegment>? = null
     private var maxEmbeddingResults: Int = 10
     private var maxMemoryMessages: Int = 10
 
-    fun withChatModel(model: ChatLanguageModel) = apply {
+    fun withChatModel(model: ChatModel) = apply {
         this.llm = model
     }
 
@@ -71,7 +72,7 @@ class DefaultRagChatModelRouterBuilder {
     }
 
     fun build(): DefaultRagChatModelRouter {
-        if (llm == null) throw IllegalStateException("ChatLanguageModel must be set")
+        if (llm == null) throw IllegalStateException("ChatModel must be set")
         if (embeddingModel == null) throw IllegalStateException("EmbeddingModel must be set")
         if (embeddingStore == null) throw IllegalStateException("EmbeddingStore must be set")
 
@@ -94,7 +95,7 @@ class DefaultRagChatModelRouterBuilder {
             .build()
 
         val langchain4jRouter =  AiServices.builder(LangchainRagLlmAgentResolver::class.java)
-            .chatLanguageModel(llm)
+            .chatModel(llm)
             .retrievalAugmentor(retrievalAugmentor)
             .systemMessageProvider { systemPrompt }
             .chatMemoryProvider { MessageWindowChatMemory.withMaxMessages(maxMemoryMessages) }

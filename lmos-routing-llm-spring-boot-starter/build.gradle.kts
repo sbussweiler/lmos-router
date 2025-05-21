@@ -1,4 +1,5 @@
-val springBootVersion: String by rootProject.extra
+val springBootVersion: String by project
+val langChain4jModulesVersion: String by project
 
 dependencies {
     api(project(":lmos-routing-core"))
@@ -8,7 +9,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
 
-    implementation("dev.langchain4j:langchain4j-azure-open-ai-spring-boot-starter:1.0.0-beta2")
-    implementation("dev.langchain4j:langchain4j-qdrant:1.0.0-beta1")
+    implementation("dev.langchain4j:langchain4j-azure-open-ai-spring-boot-starter:$langChain4jModulesVersion")
+    implementation("dev.langchain4j:langchain4j-qdrant:$langChain4jModulesVersion")
 }
 
