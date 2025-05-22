@@ -17,13 +17,18 @@ import org.eclipse.lmos.routing.core.llm.ModelRagAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_AGENT_ID
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_CAPABILITY_DESCRIPTION
 import org.eclipse.lmos.routing.core.llm.ModelAgentClassification
+import org.slf4j.LoggerFactory
 
 class DefaultModelRagAgentClassifier(
     private val langchainAIService: LangchainRagAgentClassifier
 ) : ModelRagAgentClassifier {
 
-    override fun classify(query: HybridUserQuery):ModelAgentClassification {
-        return langchainAIService.resolveAgent(query.query, query.conversationId)
+    private val logger = LoggerFactory.getLogger(DefaultModelRagAgentClassifier::class.java)
+
+    override fun classify(query: HybridUserQuery): ModelAgentClassification {
+        val classification = langchainAIService.resolveAgent(query.query, query.conversationId)
+        logger.info("[ModelRagAgentClassifier] Classified agent '${classification.agentId}' for query '${query.query}'.")
+        return classification
     }
 
     companion object {
@@ -35,7 +40,10 @@ class DefaultModelRagAgentClassifier(
 
 interface LangchainRagAgentClassifier {
 
-    fun resolveAgent(@UserMessage query: String, @MemoryId conversationId: String, ): ModelAgentClassification
+    fun resolveAgent(
+        @UserMessage query: String,
+        @MemoryId conversationId: String
+    ): ModelAgentClassification
 
 }
 
@@ -94,7 +102,7 @@ class ModelRagAgentClassifierBuilder {
             .contentInjector(agentContentInjector)
             .build()
 
-        val langchainClassifier =  AiServices.builder(LangchainRagAgentClassifier::class.java)
+        val langchainClassifier = AiServices.builder(LangchainRagAgentClassifier::class.java)
             .chatModel(llm)
             .retrievalAugmentor(retrievalAugmentor)
             .systemMessageProvider { systemPrompt }

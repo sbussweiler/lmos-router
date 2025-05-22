@@ -25,27 +25,20 @@ class DefaultHybridAgentClassifier(
     private val logger = LoggerFactory.getLogger(DefaultHybridAgentClassifier::class.java)
 
     override fun classify(query: HybridUserQuery): HybridAgentClassification {
-        logger.info("Trying to find agent for query '${query.query}'")
-        val agentClassification = embeddingAgentClassifier.classify(EmbeddingUserQuery(query.query, query.tenant))
-        if (agentClassification.agentId.isNullOrEmpty()) {
-            logger.info("Can not find agent using vector search, going to ask LLM for query '${query.query}'")
-            val llmRoutingResult = modelAgentClassifier.classify(
-                ModelUserQuery(
-                    query.query,
-                    agentClassification.consideredAgents,
-                    query.conversationId
-                )
-            )
+        val embeddingClassification = embeddingAgentClassifier.classify(EmbeddingUserQuery(query.query, query.tenant))
+        if (embeddingClassification.agentId.isNullOrEmpty()) {
+            val modelClassification = modelAgentClassifier.classify(ModelUserQuery(query.query, embeddingClassification.consideredAgents, query.conversationId))
+            logger.info("[HybridAgentClassifier] Classified agent '${modelClassification.agentId}' for query '${query.query}'.")
             return HybridAgentClassification(
-                agentId = llmRoutingResult.agentId,
-                consideredAgents = agentClassification.consideredAgents,
+                agentId = modelClassification.agentId,
+                consideredAgents = embeddingClassification.consideredAgents,
                 foundBySemanticSearch = false
             )
         }
-        logger.info("Found agent for '${query.query}': $agentClassification")
+        logger.info("[HybridAgentClassifier] Classified agent '${embeddingClassification.agentId}' for query '${query.query}'.")
         return HybridAgentClassification(
-            agentId = agentClassification.agentId,
-            consideredAgents = agentClassification.consideredAgents,
+            agentId = embeddingClassification.agentId,
+            consideredAgents = embeddingClassification.consideredAgents,
             foundBySemanticSearch = true
         )
     }

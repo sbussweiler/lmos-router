@@ -19,12 +19,13 @@ class DefaultModelAgentClassifier(
     private val logger = LoggerFactory.getLogger(DefaultModelAgentClassifier::class.java)
 
     override fun classify(query: ModelUserQuery): ModelAgentClassification {
-        logger.info("Resolving ${query.conversationId} agent for ${query.agents}")
-        return langchainAIService.resolveAgent(
+        val classification = langchainAIService.resolveAgent(
             query.query,
             formatAsString(query.agents),
             query.conversationId
         )
+        logger.info("[ModelAgentClassifier] Classified agent '${classification.agentId}' for query '${query.query}'.")
+        return classification
     }
 
     private fun formatAsString(agents: List<Agent>) =

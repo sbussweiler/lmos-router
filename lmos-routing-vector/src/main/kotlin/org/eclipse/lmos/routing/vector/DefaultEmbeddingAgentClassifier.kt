@@ -8,6 +8,7 @@ import org.eclipse.lmos.routing.core.semantic.EmbeddingAgentClassification
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
 import org.eclipse.lmos.routing.vector.utils.convertEmbeddingsToAgents
+import org.slf4j.LoggerFactory
 
 
 class DefaultEmbeddingAgentClassifier(
@@ -15,9 +16,12 @@ class DefaultEmbeddingAgentClassifier(
     private val embeddingRanker: EmbeddingRanker
 ) : EmbeddingAgentClassifier {
 
+    private val logger = LoggerFactory.getLogger(EmbeddingAgentClassifier::class.java)
+
     override fun classify(query: EmbeddingUserQuery): EmbeddingAgentClassification {
         val embeddings = embeddingRetriever.retrieve(query.tenant, query.query)
         val qualifiedAgent = embeddingRanker.findQualifiedAgent(embeddings)
+        logger.info("[EmbeddingAgentClassifier] Classified agent '${qualifiedAgent.agentId}' for query '${query.query}'.")
         return EmbeddingAgentClassification(
             qualifiedAgent.agentId,
             embeddings.convertEmbeddingsToAgents()
