@@ -2,6 +2,7 @@ package org.eclipse.lmos.routing.supervisor
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.eclipse.lmos.routing.core.llm.Agent
 import org.eclipse.lmos.routing.core.semantic.*
 import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
 import org.slf4j.LoggerFactory
@@ -45,5 +46,5 @@ class EmbeddingImporter(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ChannelRouting(
     val id: String,
-    val capabilityGroups: List<CapabilityGroup>
+    val capabilityGroups: List<Agent>
 )

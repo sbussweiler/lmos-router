@@ -7,6 +7,9 @@ server:
 spring:
   main:
     allow-bean-definition-overriding: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
 
 lmos:
   router:

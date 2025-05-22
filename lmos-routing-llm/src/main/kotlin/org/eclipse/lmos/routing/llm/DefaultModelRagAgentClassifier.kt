@@ -12,34 +12,34 @@ import dev.langchain4j.service.AiServices
 import dev.langchain4j.service.MemoryId
 import dev.langchain4j.service.UserMessage
 import dev.langchain4j.store.embedding.EmbeddingStore
-import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
-import org.eclipse.lmos.routing.core.llm.RagChatModelRouter
+import org.eclipse.lmos.routing.core.hybrid.HybridUserQuery
+import org.eclipse.lmos.routing.core.llm.ModelRagAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_AGENT_ID
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_CAPABILITY_DESCRIPTION
-import org.eclipse.lmos.routing.core.llm.ChatModelRoutingResult
+import org.eclipse.lmos.routing.core.llm.ModelAgentClassification
 
-class DefaultRagChatModelRouter(
-    private val langchainAIService: LangchainRagLlmAgentResolver
-) : RagChatModelRouter {
+class DefaultModelRagAgentClassifier(
+    private val langchainAIService: LangchainRagAgentClassifier
+) : ModelRagAgentClassifier {
 
-    override fun resolveAgent(routingRequest: EmbeddingChatModelRoutingRequest):ChatModelRoutingResult {
-        return langchainAIService.resolveAgent(routingRequest.query, routingRequest.conversationId)
+    override fun classify(query: HybridUserQuery):ModelAgentClassification {
+        return langchainAIService.resolveAgent(query.query, query.conversationId)
     }
 
     companion object {
-        fun builder(): DefaultRagChatModelRouterBuilder {
-            return DefaultRagChatModelRouterBuilder()
+        fun builder(): ModelRagAgentClassifierBuilder {
+            return ModelRagAgentClassifierBuilder()
         }
     }
 }
 
-interface LangchainRagLlmAgentResolver {
+interface LangchainRagAgentClassifier {
 
-    fun resolveAgent(@UserMessage query: String, @MemoryId conversationId: String, ): ChatModelRoutingResult
+    fun resolveAgent(@UserMessage query: String, @MemoryId conversationId: String, ): ModelAgentClassification
 
 }
 
-class DefaultRagChatModelRouterBuilder {
+class ModelRagAgentClassifierBuilder {
     private var llm: ChatModel? = null
     private var systemPrompt: String = defaultSystemPromptWithRaq()
     private var embeddingModel: EmbeddingModel? = null
@@ -71,7 +71,7 @@ class DefaultRagChatModelRouterBuilder {
         this.maxMemoryMessages = maxMessages
     }
 
-    fun build(): DefaultRagChatModelRouter {
+    fun build(): DefaultModelRagAgentClassifier {
         if (llm == null) throw IllegalStateException("ChatModel must be set")
         if (embeddingModel == null) throw IllegalStateException("EmbeddingModel must be set")
         if (embeddingStore == null) throw IllegalStateException("EmbeddingStore must be set")
@@ -94,14 +94,14 @@ class DefaultRagChatModelRouterBuilder {
             .contentInjector(agentContentInjector)
             .build()
 
-        val langchain4jRouter =  AiServices.builder(LangchainRagLlmAgentResolver::class.java)
+        val langchainClassifier =  AiServices.builder(LangchainRagAgentClassifier::class.java)
             .chatModel(llm)
             .retrievalAugmentor(retrievalAugmentor)
             .systemMessageProvider { systemPrompt }
             .chatMemoryProvider { MessageWindowChatMemory.withMaxMessages(maxMemoryMessages) }
             .build()
 
-        return DefaultRagChatModelRouter(langchain4jRouter)
+        return DefaultModelRagAgentClassifier(langchainClassifier)
     }
 
 }

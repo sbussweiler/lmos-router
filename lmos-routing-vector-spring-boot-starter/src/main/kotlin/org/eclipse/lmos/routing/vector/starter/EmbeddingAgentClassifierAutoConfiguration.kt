@@ -1,12 +1,13 @@
 package org.eclipse.lmos.routing.vector.starter
 
 import dev.langchain4j.model.embedding.EmbeddingModel
+import org.eclipse.lmos.routing.core.semantic.EmbeddingAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EmbeddingHandler
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
 import org.eclipse.lmos.routing.core.starter.EmbeddingRankingProperties
 import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
-import org.eclipse.lmos.routing.vector.EmbeddingVectorRouter
-import org.eclipse.lmos.routing.vector.injector.QdrantEmbeddingHandler
+import org.eclipse.lmos.routing.vector.DefaultEmbeddingAgentClassifier
+import org.eclipse.lmos.routing.vector.handler.QdrantEmbeddingHandler
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -18,7 +19,7 @@ import org.springframework.context.annotation.Configuration
 @EnableConfigurationProperties(
     EmbeddingRankingProperties::class
 )
-open class EmbeddingRouterAutoConfiguration {
+open class EmbeddingAgentClassifierAutoConfiguration {
 
     @Bean
     open fun embeddingHandler(
@@ -31,10 +32,10 @@ open class EmbeddingRouterAutoConfiguration {
         .build()
 
     @Bean
-    open fun vectorRouter(
+    open fun embeddingAgentClassifier(
         embeddingRetriever: EmbeddingRetriever,
         embeddingRankingProperties: EmbeddingRankingProperties,
-    ): EmbeddingVectorRouter = EmbeddingVectorRouter.builder()
+    ): EmbeddingAgentClassifier = DefaultEmbeddingAgentClassifier.builder()
         .withEmbeddingRetriever(embeddingRetriever)
         .withEmbeddingRanker(
             EmbeddingScoreRanker(

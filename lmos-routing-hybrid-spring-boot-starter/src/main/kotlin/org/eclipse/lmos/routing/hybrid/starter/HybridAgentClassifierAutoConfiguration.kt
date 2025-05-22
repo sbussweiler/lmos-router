@@ -3,10 +3,10 @@ package org.eclipse.lmos.routing.hybrid.starter
 import LangChainClientProvider.LangChainChatModelFactory
 import LangChainClientProvider.ModelClientProperties
 import dev.langchain4j.model.chat.ChatModel
-import org.eclipse.lmos.routing.core.hybrid.HybridRouter
+import org.eclipse.lmos.routing.core.hybrid.HybridAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
 import org.eclipse.lmos.routing.core.starter.EmbeddingRankingProperties
-import org.eclipse.lmos.routing.hybrid.DefaultHybridRouter
+import org.eclipse.lmos.routing.hybrid.DefaultHybridAgentClassifier
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration
     ChatModelProperties::class,
     EmbeddingRankingProperties::class
 )
-open class HybridRouterAutoConfiguration {
+open class HybridAgentClassifierAutoConfiguration {
 
     @Bean
     open fun chatModel(chatModelProperties: ChatModelProperties): ChatModel =
@@ -36,12 +36,12 @@ open class HybridRouterAutoConfiguration {
         )
 
     @Bean
-    open fun hybridRouter(
+    open fun hybridAgentClassifier(
         chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
         embeddingRetriever: EmbeddingRetriever,
         embeddingRankingProperties: EmbeddingRankingProperties,
-    ): HybridRouter = DefaultHybridRouter.builder()
+    ): HybridAgentClassifier = DefaultHybridAgentClassifier.builder()
         .withChatModel(chatModel)
         .withSystemPrompt(chatModelProperties.systemPrompt)
         .withMaxMemoryMessages(chatModelProperties.maxChatHistory)

@@ -1,38 +1,37 @@
 package org.eclipse.lmos.routing.vector
 
-import org.eclipse.lmos.routing.core.EmbeddingRoutingRequest
-import org.eclipse.lmos.routing.core.semantic.EmbeddingRouter
+import org.eclipse.lmos.routing.core.semantic.EmbeddingUserQuery
+import org.eclipse.lmos.routing.core.semantic.EmbeddingAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRanker
 import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
-import org.eclipse.lmos.routing.core.semantic.EmbeddingRoutingResult
+import org.eclipse.lmos.routing.core.semantic.EmbeddingAgentClassification
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
 import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
 import org.eclipse.lmos.routing.vector.utils.convertEmbeddingsToAgents
 
 
-class EmbeddingVectorRouter(
+class DefaultEmbeddingAgentClassifier(
     private val embeddingRetriever: EmbeddingRetriever,
     private val embeddingRanker: EmbeddingRanker
-) : EmbeddingRouter {
+) : EmbeddingAgentClassifier {
 
-    override fun resolveAgent(routingRequest: EmbeddingRoutingRequest): EmbeddingRoutingResult {
-        val embeddings = embeddingRetriever.retrieve(routingRequest.tenant, routingRequest.query)
+    override fun classify(query: EmbeddingUserQuery): EmbeddingAgentClassification {
+        val embeddings = embeddingRetriever.retrieve(query.tenant, query.query)
         val qualifiedAgent = embeddingRanker.findQualifiedAgent(embeddings)
-        return EmbeddingRoutingResult(
+        return EmbeddingAgentClassification(
             qualifiedAgent.agentId,
-            embeddings.convertEmbeddingsToAgents(),
-            qualifiedAgent.agentId != null
+            embeddings.convertEmbeddingsToAgents()
         )
     }
 
     companion object {
-        fun builder(): VectorRouterBuilder {
-            return VectorRouterBuilder()
+        fun builder(): EmbeddingAgentClassifierBuilder {
+            return EmbeddingAgentClassifierBuilder()
         }
     }
 }
 
-class VectorRouterBuilder {
+class EmbeddingAgentClassifierBuilder {
     private var embeddingRetriever: EmbeddingRetriever? = null
     private var embeddingRankingThreshold: EmbeddingRankingThreshold = EmbeddingRankingThreshold()
     private var embeddingRanker: EmbeddingRanker = EmbeddingScoreRanker(embeddingRankingThreshold)
@@ -45,8 +44,8 @@ class VectorRouterBuilder {
         this.embeddingRanker = embeddingRanker
     }
 
-    fun build(): EmbeddingVectorRouter {
+    fun build(): DefaultEmbeddingAgentClassifier {
         if (embeddingRetriever == null) throw IllegalStateException("EmbeddingRetriever must be set")
-        return EmbeddingVectorRouter(embeddingRetriever!!, embeddingRanker)
+        return DefaultEmbeddingAgentClassifier(embeddingRetriever!!, embeddingRanker)
     }
 }

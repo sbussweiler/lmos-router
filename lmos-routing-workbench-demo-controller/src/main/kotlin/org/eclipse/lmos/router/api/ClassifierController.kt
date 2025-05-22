@@ -2,19 +2,15 @@ package org.eclipse.lmos.router.api
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.eclipse.lmos.routing.core.ChatModelRoutingRequest
-import org.eclipse.lmos.routing.core.EmbeddingChatModelRoutingRequest
-import org.eclipse.lmos.routing.core.EmbeddingRoutingRequest
-import org.eclipse.lmos.routing.core.hybrid.HybridRouter
-import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
-import org.eclipse.lmos.routing.core.semantic.TenantNotSupportedException
+import org.eclipse.lmos.routing.core.llm.ModelUserQuery
+import org.eclipse.lmos.routing.core.hybrid.HybridUserQuery
+import org.eclipse.lmos.routing.core.hybrid.HybridAgentClassifier
+import org.eclipse.lmos.routing.core.hybrid.HybridAgentClassification
 import org.eclipse.lmos.routing.core.llm.Agent
-import org.eclipse.lmos.routing.core.llm.ChatModelRouter
-import org.eclipse.lmos.routing.core.semantic.Embedding
-import org.eclipse.lmos.routing.core.llm.ChatModelRoutingResult
-import org.eclipse.lmos.routing.core.llm.RagChatModelRouter
-import org.eclipse.lmos.routing.core.semantic.EmbeddingRoutingResult
-import org.eclipse.lmos.routing.vector.EmbeddingVectorRouter
+import org.eclipse.lmos.routing.core.llm.ModelAgentClassifier
+import org.eclipse.lmos.routing.core.llm.ModelAgentClassification
+import org.eclipse.lmos.routing.core.llm.ModelRagAgentClassifier
+import org.eclipse.lmos.routing.core.semantic.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -26,22 +22,22 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/routings", produces = [MediaType.APPLICATION_JSON_VALUE])
-class RouterController(
-    private val vectorRouter: EmbeddingVectorRouter,
-    private val llmRouter: ChatModelRouter,
-    private val ragRouter: RagChatModelRouter,
-    private val hybridRouter: HybridRouter,
+class ClassifierController(
+    private val embeddingClassifier: EmbeddingAgentClassifier,
+    private val modelClassifier: ModelAgentClassifier,
+    private val modelRaqClassifier: ModelRagAgentClassifier,
+    private val hybridClassifier: HybridAgentClassifier,
     private val embeddingRetriever: EmbeddingRetriever
 ) {
 
-    private val logger = LoggerFactory.getLogger(RouterController::class.java)
+    private val logger = LoggerFactory.getLogger(ClassifierController::class.java)
 
     @PostMapping("/llm")
-    fun routeByLLM(@RequestBody userQuery: UserAgentQuery): ChatModelRoutingResult {
+    fun routeByLLM(@RequestBody userQuery: UserAgentQuery): ModelAgentClassification {
         logger.info("Route user query '${userQuery.query}' by LLM.")
         val conversationId = userQuery.conversationId ?: "default"
-        return llmRouter.resolveAgent(
-            ChatModelRoutingRequest(
+        return modelClassifier.classify(
+            ModelUserQuery(
                 userQuery.query,
                 userQuery.agents,
                 conversationId
@@ -50,11 +46,11 @@ class RouterController(
     }
 
     @PostMapping("/rag-llm")
-    fun routeByRagLLM(@RequestBody userQuery: UserRequest): ChatModelRoutingResult {
+    fun routeByRagLLM(@RequestBody userQuery: UserRequest): ModelAgentClassification {
         logger.info("Route user query '${userQuery.query}' by RagLLM.")
         val conversationId = userQuery.conversationId ?: "default"
-        return ragRouter.resolveAgent(
-            EmbeddingChatModelRoutingRequest(
+        return modelRaqClassifier.classify(
+            HybridUserQuery(
                 userQuery.query,
                 userQuery.tenant,
                 conversationId
@@ -63,10 +59,10 @@ class RouterController(
     }
 
     @PostMapping("/vector")
-    fun vectorRouting(@RequestBody userQuery: UserRequest): EmbeddingRoutingResult {
+    fun vectorRouting(@RequestBody userQuery: UserRequest): EmbeddingAgentClassification {
         logger.info("Perform vector routing for ${userQuery.tenant} and user query '${userQuery.query}'.")
-        return vectorRouter.resolveAgent(
-            EmbeddingRoutingRequest(
+        return embeddingClassifier.classify(
+            EmbeddingUserQuery(
                 userQuery.query,
                 userQuery.tenant
             )
@@ -80,11 +76,11 @@ class RouterController(
     }
 
     @PostMapping("/hybrid")
-    fun routeHybrid(@RequestBody userQuery: UserRequest): EmbeddingRoutingResult {
+    fun routeHybrid(@RequestBody userQuery: UserRequest): HybridAgentClassification {
         logger.info("Route user query '${userQuery.query}' by embeddings.")
         val conversationId = userQuery.conversationId ?: "default"
-        return hybridRouter.resolveAgent(
-            EmbeddingChatModelRoutingRequest(
+        return hybridClassifier.classify(
+            HybridUserQuery(
                 userQuery.query,
                 userQuery.tenant,
                 conversationId

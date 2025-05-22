@@ -1,4 +1,4 @@
-package org.eclipse.lmos.routing.vector.injector
+package org.eclipse.lmos.routing.vector.handler
 
 import dev.langchain4j.model.embedding.EmbeddingModel
 import io.qdrant.client.ConditionFactory
@@ -10,6 +10,8 @@ import io.qdrant.client.VectorsFactory.vectors
 import io.qdrant.client.grpc.Collections.Distance
 import io.qdrant.client.grpc.Collections.VectorParams
 import io.qdrant.client.grpc.Points.*
+import org.eclipse.lmos.routing.core.llm.Agent
+import org.eclipse.lmos.routing.core.llm.Capability
 import org.eclipse.lmos.routing.core.semantic.*
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -30,19 +32,19 @@ class QdrantEmbeddingHandler(
         ).build()
     )
 
-    override fun ingest(tenant: String, groups: List<CapabilityGroup>) {
-        logger.info("Start ingesting embeddings into the '$tenant' collection for the following agents: ${groups.map { it.id }}.")
-        groups.forEach {
+    override fun ingest(tenant: String, agents: List<Agent>) {
+        logger.info("Start ingesting embeddings into the '$tenant' collection for the following agents: ${agents.map { it.id }}.")
+        agents.forEach {
             try {
                 ingest(tenant, it)
             } catch (e: Exception) {
                 logger.error("Failed to ingest embeddings for agent '${it.id}' to collection '$tenant'.", e)
             }
         }
-        logger.info("Completed ingestion of embeddings into the '$tenant' collection for the following agents: ${groups.map { it.id }}.")
+        logger.info("Completed ingestion of embeddings into the '$tenant' collection for the following agents: ${agents.map { it.id }}.")
     }
 
-    private fun ingest(tenant: String, group: CapabilityGroup) {
+    private fun ingest(tenant: String, group: Agent) {
         createCollectionIfNotExist(tenant)
         val existingPoints = getExistingPoints(tenant, group.id)
         val desiredPoints = getDesiredPoints(group)
@@ -78,7 +80,7 @@ class QdrantEmbeddingHandler(
             .associateBy { UUID.fromString(it.id.uuid) }
     }
 
-    private fun getDesiredPoints(group: CapabilityGroup): Map<UUID, PointInfo> =
+    private fun getDesiredPoints(group: Agent): Map<UUID, PointInfo> =
         group.capabilities.flatMap { capability ->
             capability.examples.map { example ->
                 val rawId = "${group.id}::${capability.id}::${example.hashCode()}"
@@ -92,8 +94,6 @@ class QdrantEmbeddingHandler(
         val payload = mapOf(
             EMBEDDING_METADATA_AGENT_ID to value(pointInfo.groupId),
             EMBEDDING_METADATA_CAPABILITY_ID to value(pointInfo.capability.id),
-            EMBEDDING_METADATA_CAPABILITY_NAME to value(pointInfo.capability.name),
-            EMBEDDING_METADATA_CAPABILITY_VERSION to value(pointInfo.capability.version),
             EMBEDDING_METADATA_CAPABILITY_DESCRIPTION to value(pointInfo.capability.description),
             EMBEDDING_METADATA_CAPABILITY_EXAMPLE to value(pointInfo.example),
         )

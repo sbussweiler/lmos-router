@@ -7,12 +7,12 @@ import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore
-import org.eclipse.lmos.routing.core.llm.ChatModelRouter
-import org.eclipse.lmos.routing.core.llm.RagChatModelRouter
+import org.eclipse.lmos.routing.core.llm.ModelAgentClassifier
+import org.eclipse.lmos.routing.core.llm.ModelRagAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_CAPABILITY_EXAMPLE
 import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
-import org.eclipse.lmos.routing.llm.DefaultChatModelRouter
-import org.eclipse.lmos.routing.llm.DefaultRagChatModelRouter
+import org.eclipse.lmos.routing.llm.DefaultModelAgentClassifier
+import org.eclipse.lmos.routing.llm.DefaultModelRagAgentClassifier
 import org.eclipse.lmos.routing.llm.defaultSystemPromptWithRaq
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Bean
     EmbeddingStoreProperties::class,
     ChatModelProperties::class
 )
-open class ChatModelRouterAutoConfiguration {
+open class ModelAgentClassifierAutoConfiguration {
 
     @Bean
     open fun chatModel(chatModelProperties: ChatModelProperties): ChatModel =
@@ -39,22 +39,22 @@ open class ChatModelRouterAutoConfiguration {
         )
 
     @Bean
-    open fun llmRouter(
+    open fun modelAgentClassifier(
         chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
-    ): ChatModelRouter = DefaultChatModelRouter.builder()
+    ): ModelAgentClassifier = DefaultModelAgentClassifier.builder()
         .withChatModel(chatModel)
         .withSystemPrompt(chatModelProperties.systemPrompt)
         .withMaxMemoryMessages(chatModelProperties.maxChatHistory)
         .build()
 
     @Bean
-    fun ragLlmRouter(
+    fun modelRagAgentClassifier(
         chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
         embeddingModel: EmbeddingModel,
         embeddingStore: EmbeddingStore<TextSegment>
-    ): RagChatModelRouter = DefaultRagChatModelRouter.builder()
+    ): ModelRagAgentClassifier = DefaultModelRagAgentClassifier.builder()
         .withChatModel(chatModel)
         .withSystemPrompt(defaultSystemPromptWithRaq())
         .withMaxMemoryMessages(chatModelProperties.maxChatHistory)
