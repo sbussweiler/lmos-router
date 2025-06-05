@@ -51,7 +51,7 @@ class EmbeddingScoreRanker(
             highestScoreWeight >= thresholds.minWeight &&
             distance >= thresholds.minDistance &&
             meanScore >= thresholds.minMeanScore &&
-            relDistance >= thresholds.minRelDistance
+            relDistance >= thresholds.minRealDistance
         ) {
             QualifiedAgent(firstRankedAgent.key)
         } else {
@@ -65,5 +65,5 @@ data class EmbeddingRankingThreshold(
     val minWeight: Double = 5.0,
     val minDistance: Double = 4.0,
     val minMeanScore: Double = 0.8,
-    val minRelDistance: Double = 0.3
+    val minRealDistance: Double = 0.3
 )

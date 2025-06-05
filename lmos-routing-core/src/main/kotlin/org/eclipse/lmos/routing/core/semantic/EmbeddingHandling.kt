@@ -18,11 +18,30 @@ interface EmbeddingHandler {
     fun ingest(tenant: String, agents: List<Agent>)
 
     /**
+     * Ingests the capabilities of the provided [agent] into the embedding store for the specified [tenant].
+     *
+     * This process typically includes transforming capability examples into embeddings
+     * and storing them for use in semantic search or classification.
+     *
+     * @param tenant The unique identifier for the tenant/domain.
+     * @param agent The list of agents whose capabilities should be ingested.
+     */
+    fun ingest(tenant: String, agent: Agent)
+
+    /**
      * Deletes all stored agent capability embeddings associated with the specified [tenant].
      *
      * @param tenant The unique identifier for the tenant/domain.
      */
     fun remove(tenant: String)
+
+    /**
+     * Deletes all stored agent capability embeddings associated with the specified [tenant] and [agent].
+     *
+     * @param tenant The unique identifier for the tenant/domain.
+     * @param agent The agent whose embeddings should be removed.
+     */
+    fun remove(tenant: String, agent: Agent)
 }
 
 /**

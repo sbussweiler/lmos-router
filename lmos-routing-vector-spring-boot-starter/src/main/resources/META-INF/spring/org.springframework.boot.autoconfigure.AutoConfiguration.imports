@@ -1,1 +1,2 @@
 org.eclipse.lmos.routing.vector.starter.EmbeddingAgentClassifierAutoConfiguration
+org.eclipse.lmos.routing.vector.starter.EmbeddingHandlerAutoConfiguration

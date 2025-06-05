@@ -44,25 +44,25 @@ class QdrantEmbeddingHandler(
         logger.info("Completed ingestion of embeddings into the '$tenant' collection for the following agents: ${agents.map { it.id }}.")
     }
 
-    private fun ingest(tenant: String, group: Agent) {
+    override fun ingest(tenant: String, agent: Agent) {
         createCollectionIfNotExist(tenant)
-        val existingPoints = getExistingPoints(tenant, group.id)
-        val desiredPoints = getDesiredPoints(group)
+        val existingPoints = getExistingPoints(tenant, agent.id)
+        val desiredPoints = getDesiredPoints(agent)
         val pointsToAdd = desiredPoints.keys - existingPoints.keys
         val pointsToDelete = existingPoints.keys - desiredPoints.keys
 
         if (pointsToAdd.isNotEmpty()) {
             val points = pointsToAdd.map { createPointStruct(desiredPoints[it]!!) }
             client.upsertAsync(tenant, points)
-            logger.info("Added ${pointsToAdd.size} embeddings to the '$tenant' collection for agent '${group.id}'.")
+            logger.info("Added ${pointsToAdd.size} embeddings to the '$tenant' collection for agent '${agent.id}'.")
         }
         if (pointsToDelete.isNotEmpty()) {
             val points = pointsToDelete.map { existingPoints[it]!! }
             client.deleteAsync(tenant, points.map { it.id })
-            logger.info("Deleted ${pointsToDelete.size} embeddings from the '$tenant' collection for agent '${group.id}'.")
+            logger.info("Deleted ${pointsToDelete.size} embeddings from the '$tenant' collection for agent '${agent.id}'.")
         }
         if (pointsToAdd.isEmpty() && pointsToDelete.isEmpty()) {
-            logger.info("No embedding changes for agent '${group.id}'.")
+            logger.info("No embedding changes for agent '${agent.id}'.")
         }
     }
 
@@ -80,19 +80,19 @@ class QdrantEmbeddingHandler(
             .associateBy { UUID.fromString(it.id.uuid) }
     }
 
-    private fun getDesiredPoints(group: Agent): Map<UUID, PointInfo> =
-        group.capabilities.flatMap { capability ->
+    private fun getDesiredPoints(agent: Agent): Map<UUID, PointInfo> =
+        agent.capabilities.flatMap { capability ->
             capability.examples.map { example ->
-                val rawId = "${group.id}::${capability.id}::${example.hashCode()}"
+                val rawId = "${agent.id}::${capability.id}::${example.hashCode()}"
                 val uuid = UUID.nameUUIDFromBytes(rawId.toByteArray())
-                uuid to PointInfo(uuid, group.id, capability, example)
+                uuid to PointInfo(uuid, agent.id, capability, example)
             }
         }.toMap()
 
     private fun createPointStruct(pointInfo: PointInfo): PointStruct {
         val embedding = embedText(pointInfo.example)
         val payload = mapOf(
-            EMBEDDING_METADATA_AGENT_ID to value(pointInfo.groupId),
+            EMBEDDING_METADATA_AGENT_ID to value(pointInfo.agentId),
             EMBEDDING_METADATA_CAPABILITY_ID to value(pointInfo.capability.id),
             EMBEDDING_METADATA_CAPABILITY_DESCRIPTION to value(pointInfo.capability.description),
             EMBEDDING_METADATA_CAPABILITY_EXAMPLE to value(pointInfo.example),
@@ -126,6 +126,16 @@ class QdrantEmbeddingHandler(
         logger.info("Removed '$tenant' collection and all related embeddings.")
     }
 
+    override fun remove(tenant: String, agent: Agent) {
+        val pointsToDelete = getDesiredPoints(agent)
+            .keys
+            .map {
+                PointIdFactory.id(it)
+            }
+        client.deleteAsync(tenant, pointsToDelete).get()
+        logger.info("Removed ${pointsToDelete.size} embeddings from the '$tenant' collection for agent '${agent.id}'.")
+    }
+
     companion object {
         fun builder(): QdrantEmbeddingHandlerBuilder {
             return QdrantEmbeddingHandlerBuilder()
@@ -135,7 +145,7 @@ class QdrantEmbeddingHandler(
 
 data class PointInfo(
     val uuid: UUID,
-    val groupId: String,
+    val agentId: String,
     val capability: Capability,
     val example: String
 )

@@ -1,7 +1,7 @@
 package org.eclipse.lmos.routing.llm.starter
 
 import LangChainClientProvider.LangChainChatModelFactory
-import LangChainClientProvider.ModelClientProperties
+import LangChainClientProvider.ChatModelClientProperties
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
@@ -10,10 +10,12 @@ import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore
 import org.eclipse.lmos.routing.core.llm.ModelAgentClassifier
 import org.eclipse.lmos.routing.core.llm.ModelRagAgentClassifier
 import org.eclipse.lmos.routing.core.semantic.EMBEDDING_METADATA_CAPABILITY_EXAMPLE
+import org.eclipse.lmos.routing.core.starter.ChatModelProperties
 import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
 import org.eclipse.lmos.routing.llm.DefaultModelAgentClassifier
 import org.eclipse.lmos.routing.llm.DefaultModelRagAgentClassifier
-import org.eclipse.lmos.routing.llm.defaultSystemPromptWithRaq
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 
@@ -22,12 +24,19 @@ import org.springframework.context.annotation.Bean
     EmbeddingStoreProperties::class,
     ChatModelProperties::class
 )
+@ConditionalOnProperty(
+    prefix = "lmos.router.classifier.llm",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false,
+)
 open class ModelAgentClassifierAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean(ChatModel::class)
     open fun chatModel(chatModelProperties: ChatModelProperties): ChatModel =
         LangChainChatModelFactory.createClient(
-            ModelClientProperties(
+            ChatModelClientProperties(
                 provider = chatModelProperties.provider,
                 apiKey = chatModelProperties.apiKey,
                 baseUrl = chatModelProperties.baseUrl,
@@ -39,6 +48,7 @@ open class ModelAgentClassifierAutoConfiguration {
         )
 
     @Bean
+    @ConditionalOnMissingBean(ModelAgentClassifier::class)
     open fun modelAgentClassifier(
         chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
@@ -49,6 +59,7 @@ open class ModelAgentClassifierAutoConfiguration {
         .build()
 
     @Bean
+    @ConditionalOnMissingBean(ModelRagAgentClassifier::class)
     fun modelRagAgentClassifier(
         chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
@@ -56,13 +67,14 @@ open class ModelAgentClassifierAutoConfiguration {
         embeddingStore: EmbeddingStore<TextSegment>
     ): ModelRagAgentClassifier = DefaultModelRagAgentClassifier.builder()
         .withChatModel(chatModel)
-        .withSystemPrompt(defaultSystemPromptWithRaq())
+        .withSystemPrompt(chatModelProperties.systemPrompt)
         .withMaxMemoryMessages(chatModelProperties.maxChatHistory)
         .withEmbeddingModel(embeddingModel)
         .withEmbeddingStore(embeddingStore)
         .build()
 
     @Bean
+    @ConditionalOnMissingBean(EmbeddingStore::class)
     fun embeddingStore(
         embeddingModel: EmbeddingModel,
         embeddingStoreProperties: EmbeddingStoreProperties

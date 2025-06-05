@@ -49,7 +49,7 @@ interface LangchainRagAgentClassifier {
 
 class ModelRagAgentClassifierBuilder {
     private var llm: ChatModel? = null
-    private var systemPrompt: String = defaultSystemPromptWithRaq()
+    private var systemPrompt: String? = null
     private var embeddingModel: EmbeddingModel? = null
     private var embeddingStore: EmbeddingStore<TextSegment>? = null
     private var maxEmbeddingResults: Int = 10
@@ -83,6 +83,7 @@ class ModelRagAgentClassifierBuilder {
         if (llm == null) throw IllegalStateException("ChatModel must be set")
         if (embeddingModel == null) throw IllegalStateException("EmbeddingModel must be set")
         if (embeddingStore == null) throw IllegalStateException("EmbeddingStore must be set")
+        if (systemPrompt.isNullOrEmpty()) systemPrompt = defaultSystemPromptWithRaq()
 
         val agentContentInjector = AgentContentInjector(
             listOf(

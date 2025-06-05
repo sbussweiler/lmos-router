@@ -56,7 +56,7 @@ interface LangchainAgentClassifier {
 
 class ModelAgentClassifierBuilder {
     private var model: ChatModel? = null
-    private var systemPrompt: String = defaultSystemPrompt()
+    private var systemPrompt: String? = null
     private var maxMemoryMessages: Int = 10
 
     fun withChatModel(model: ChatModel) = apply {

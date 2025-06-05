@@ -27,7 +27,13 @@ class DefaultHybridAgentClassifier(
     override fun classify(query: HybridUserQuery): HybridAgentClassification {
         val embeddingClassification = embeddingAgentClassifier.classify(EmbeddingUserQuery(query.query, query.tenant))
         if (embeddingClassification.agentId.isNullOrEmpty()) {
-            val modelClassification = modelAgentClassifier.classify(ModelUserQuery(query.query, embeddingClassification.consideredAgents, query.conversationId))
+            val modelClassification = modelAgentClassifier.classify(
+                ModelUserQuery(
+                    query.query,
+                    embeddingClassification.consideredAgents,
+                    query.conversationId
+                )
+            )
             logger.info("[HybridAgentClassifier] Classified agent '${modelClassification.agentId}' for query '${query.query}'.")
             return HybridAgentClassification(
                 agentId = modelClassification.agentId,
@@ -53,7 +59,7 @@ class DefaultHybridAgentClassifier(
 
 class HybridAgentClassifierBuilder {
     private var llm: ChatModel? = null
-    private var llmSystemPrompt: String = defaultSystemPrompt()
+    private var llmSystemPrompt: String? = null
     private var llmMaxChatMemory: Int = 10
     private var embeddingRetriever: EmbeddingRetriever? = null
     private var embeddingRanker: EmbeddingRanker = EmbeddingScoreRanker(EmbeddingRankingThreshold())
@@ -81,6 +87,7 @@ class HybridAgentClassifierBuilder {
     fun build(): DefaultHybridAgentClassifier {
         if (llm == null) throw IllegalStateException("ChatModel must be set")
         if (embeddingRetriever == null) throw IllegalStateException("EmbeddingRetriever must be set")
+        if (llmSystemPrompt.isNullOrEmpty()) llmSystemPrompt = defaultSystemPrompt()
 
         val embeddingClassifier = DefaultEmbeddingAgentClassifier.builder()
             .withEmbeddingRetriever(embeddingRetriever!!)
@@ -89,7 +96,7 @@ class HybridAgentClassifierBuilder {
 
         val modelClassifier = DefaultModelAgentClassifier.builder()
             .withChatModel(llm!!)
-            .withSystemPrompt(llmSystemPrompt)
+            .withSystemPrompt(llmSystemPrompt!!)
             .withMaxMemoryMessages(llmMaxChatMemory)
             .build()
 

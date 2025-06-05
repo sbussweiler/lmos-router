@@ -12,7 +12,6 @@ plugins {
 
 
 dependencies {
-    implementation(project(":lmos-routing-core-spring-boot-starter"))
     implementation(project(":lmos-routing-llm-spring-boot-starter"))
     implementation(project(":lmos-routing-vector-spring-boot-starter"))
     implementation(project(":lmos-routing-hybrid-spring-boot-starter"))

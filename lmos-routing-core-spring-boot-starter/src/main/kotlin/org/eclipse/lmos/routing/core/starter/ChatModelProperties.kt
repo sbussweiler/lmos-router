@@ -1,6 +1,5 @@
-package org.eclipse.lmos.routing.hybrid.starter
+package org.eclipse.lmos.routing.core.starter
 
-import org.eclipse.lmos.routing.llm.defaultSystemPrompt
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "lmos.router.llm")
@@ -13,5 +12,5 @@ data class ChatModelProperties(
     val temperature: Double = 0.0,
     val logRequestsAndResponses: Boolean = false,
     val maxChatHistory: Int = 10,
-    val systemPrompt: String = defaultSystemPrompt(),
+    val systemPrompt: String = ""
 )

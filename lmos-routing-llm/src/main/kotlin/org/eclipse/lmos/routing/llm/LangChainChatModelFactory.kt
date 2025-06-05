@@ -19,8 +19,9 @@ import org.slf4j.LoggerFactory
  */
 class LangChainChatModelFactory private constructor() {
     companion object {
-        fun createClient(properties: ModelClientProperties): ChatModel {
+        fun createClient(properties: ChatModelClientProperties): ChatModel {
             return when (properties.provider) {
+
                 OPENAI.name.lowercase(),
                     -> {
                     OpenAiChatModelBuilder()
@@ -124,7 +125,7 @@ enum class LangChainClientProvider {
     OTHER,
 }
 
-open class ModelClientProperties(
+open class ChatModelClientProperties(
     open val provider: String,
     open val apiKey: String? = null,
     open val baseUrl: String? = null,

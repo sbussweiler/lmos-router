@@ -1,15 +1,10 @@
 package org.eclipse.lmos.routing.vector.starter
 
 import dev.langchain4j.model.embedding.EmbeddingModel
-import org.eclipse.lmos.routing.core.semantic.EmbeddingAgentClassifier
-import org.eclipse.lmos.routing.core.semantic.EmbeddingRetriever
+import org.eclipse.lmos.routing.core.semantic.EmbeddingHandler
 import org.eclipse.lmos.routing.core.starter.EmbeddingModelProperties
-import org.eclipse.lmos.routing.core.starter.EmbeddingRankingProperties
 import org.eclipse.lmos.routing.core.starter.EmbeddingStoreProperties
-import org.eclipse.lmos.routing.vector.DefaultEmbeddingAgentClassifier
-import org.eclipse.lmos.routing.vector.ranker.EmbeddingRankingThreshold
-import org.eclipse.lmos.routing.vector.ranker.EmbeddingScoreRanker
-import org.eclipse.lmos.routing.vector.retriever.QdrantEmbeddingRetriever
+import org.eclipse.lmos.routing.vector.handler.QdrantEmbeddingHandler
 import org.eclipse.lmos.routing.vector.utils.EmbeddingModelClientProperties
 import org.eclipse.lmos.routing.vector.utils.LangChainEmbeddingModelFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -18,19 +13,18 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-
 @Configuration
 @EnableConfigurationProperties(
+    EmbeddingModelProperties::class,
     EmbeddingStoreProperties::class,
-    EmbeddingRankingProperties::class,
 )
 @ConditionalOnProperty(
-    prefix = "lmos.router.classifier.vector",
+    prefix = "lmos.router.embedding",
     name = ["enabled"],
     havingValue = "true",
     matchIfMissing = false,
 )
-open class EmbeddingAgentClassifierAutoConfiguration {
+open class EmbeddingHandlerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(EmbeddingModel::class)
@@ -47,35 +41,14 @@ open class EmbeddingAgentClassifierAutoConfiguration {
         )
 
     @Bean
-    @ConditionalOnMissingBean(EmbeddingRetriever::class)
-    open fun embeddingRetriever(
+    @ConditionalOnMissingBean(EmbeddingHandler::class)
+    open fun embeddingHandler(
         embeddingModel: EmbeddingModel,
         embeddingStoreProperties: EmbeddingStoreProperties,
-        embeddingRankingProperties: EmbeddingRankingProperties
-    ): EmbeddingRetriever = QdrantEmbeddingRetriever.builder()
+    ): EmbeddingHandler = QdrantEmbeddingHandler.builder()
+        .withEmbeddingModel(embeddingModel)
         .withQdrantHost(embeddingStoreProperties.host)
         .withQdrantPort(embeddingStoreProperties.port)
-        .withEmbeddingModel(embeddingModel)
-        .withEmbeddingMaxResults(embeddingRankingProperties.maxEmbeddings)
-        .build()
-
-    @Bean
-    @ConditionalOnMissingBean(EmbeddingAgentClassifier::class)
-    open fun embeddingAgentClassifier(
-        embeddingRetriever: EmbeddingRetriever,
-        embeddingRankingProperties: EmbeddingRankingProperties,
-    ): EmbeddingAgentClassifier = DefaultEmbeddingAgentClassifier.builder()
-        .withEmbeddingRetriever(embeddingRetriever)
-        .withEmbeddingRanker(
-            EmbeddingScoreRanker(
-                EmbeddingRankingThreshold(
-                    minWeight = embeddingRankingProperties.minWeight,
-                    minDistance = embeddingRankingProperties.minDistance,
-                    minMeanScore = embeddingRankingProperties.minMeanScore,
-                    minRealDistance = embeddingRankingProperties.minRealDistance,
-                )
-            )
-        )
         .build()
 
 }
