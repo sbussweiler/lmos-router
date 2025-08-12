@@ -10,8 +10,6 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Agent Classifier
 
-> This section of the README refers to the lmos-classifier-* modules, which are intended to replace the older lmos-router-* modules.
-
 The LMOS Agent Classifier library allows you to set up an agent classification system that identifies the most appropriate agent based on the conversation and system context, using the following complementary classifier strategies:
 
 - **Embedding-based Classification**: Finds the most qualified agent using a semantic vector search and a ranking algorithm.
