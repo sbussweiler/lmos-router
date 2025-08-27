@@ -479,7 +479,6 @@ lmos:
       api-key: your-api-key
       base-url: https://model-base-url.com
       model: gpt-4
-      maxChatHistory: 10
 ````
 
 Refer to the table to see which LLM providers are supported and what configuration options are available for each.
@@ -505,10 +504,10 @@ lmos:
   router:
     embedding:
       model:
-        provider: openai                                           # or huggingface, local_onnx
+        provider: openai                                           # openai, huggingface, local_onnx
         base-url: https://my-api.openai.com/v1/embeddings          # Required for openai
         model-name: hugginface-model-name                          # Required for huggingface
-        api-key: hugginface-api-key                                # Required for huggingface
+        api-key: hugginface-api-key                                # Required for openai and huggingface
         model-path: /path/to/local-model.onnx                      # Required for local_onnx
         tokenizer-path: /path/to/local-tokenizer.json              # Required for local_onnx
 ```
@@ -516,8 +515,8 @@ lmos:
 Refer to the table to see which providers are supported and what configuration options are available for each.
 
 | Provider      | Required Settings              |
-| ------------- | ------------------------------ |
-| `openai`      | `base-url`                     |
+| ------------- |--------------------------------|
+| `openai`      | `base-url`, `api-key`          |
 | `huggingface` | `model-name`, `api-key`        |
 | `local_onnx`  | `model-path`, `tokenizer-path` |
 
