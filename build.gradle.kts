@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -18,7 +17,7 @@ plugins {
     id("org.jetbrains.dokka") version "2.0.0"
     id("org.cyclonedx.bom") version "2.3.1" apply false
     id("net.researchgate.release") version "3.1.0"
-    id("com.vanniktech.maven.publish") version "0.32.0"
+    id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
 subprojects {
@@ -81,7 +80,7 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+        publishToMavenCentral(automaticRelease = true)
         signAllPublications()
 
         pom {
