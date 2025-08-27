@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -41,10 +42,9 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs += "-Xjsr305=strict"
-            freeCompilerArgs += "-Xcontext-receivers"
-            jvmTarget = "21"
+        compilerOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xcontext-receivers")
+            jvmTarget = JvmTarget.JVM_21
         }
     }
 
