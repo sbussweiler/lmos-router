@@ -15,6 +15,5 @@ data class ChatModelProperties(
     val maxTokens: Int = 2000,
     val temperature: Double = 0.0,
     val logRequestsAndResponses: Boolean = false,
-    val maxChatHistory: Int = 10,
     val systemPrompt: String = "",
 )
