@@ -23,6 +23,7 @@ import org.eclipse.lmos.classifier.core.ClassificationResult
 import org.eclipse.lmos.classifier.core.ClassifiedAgent
 import org.eclipse.lmos.classifier.core.HistoryMessageRole.*
 import org.eclipse.lmos.classifier.core.llm.ModelAgentClassifier
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class DefaultModelAgentClassifier(
@@ -36,9 +37,7 @@ class DefaultModelAgentClassifier(
         val chatRequest = prepareChatRequest(request)
         val chatResponse = chatModel.chat(chatRequest)
         val classificationResult = prepareClassificationResult(chatResponse, request.inputContext.agents)
-        logger.info(
-            "[${javaClass.simpleName}] Classified agent '${classificationResult.agents}' for query '${request.inputContext.userMessage}'.",
-        )
+        logger.logClassificationResult(request, classificationResult)
         return classificationResult
     }
 
@@ -102,6 +101,29 @@ class DefaultModelAgentClassifier(
         }
     }
 
+    private fun Logger.logClassificationResult(
+        request: ClassificationRequest,
+        result: ClassificationResult,
+    ) {
+        val candidateAgents =
+            request.inputContext.agents.map { agent ->
+                LlmCandidateAgent(agent.id, agent.capabilities.map { cap -> LlmCandidateCapability(cap.id, cap.description) })
+            }
+        val classifiedAgentId = result.agents.firstOrNull()?.id ?: "none"
+        this
+            .atInfo()
+            .addKeyValue("classifier-type", "LLM")
+            .addKeyValue("classifier-user-message", request.inputContext.userMessage)
+            .addKeyValue("classifier-candidate-agents", candidateAgents)
+            .addKeyValue("classifier-selected-agent", classifiedAgentId)
+            .addKeyValue("event", "CLASSIFICATION_LLM_DONE")
+            .log(
+                "Executed classification using the LLM. Query: '{}', classified agent: '{}'.",
+                request.inputContext.userMessage,
+                classifiedAgentId,
+            )
+    }
+
     companion object {
         fun builder(): ModelAgentClassifierBuilder = ModelAgentClassifierBuilder()
     }
@@ -115,6 +137,16 @@ data class ClassifiedAgentResult(
 data class AgentDescription(
     val agentId: String,
     val descriptions: List<String>,
+)
+
+data class LlmCandidateAgent(
+    val id: String,
+    val capabilities: List<LlmCandidateCapability>,
+)
+
+data class LlmCandidateCapability(
+    val id: String,
+    val description: String,
 )
 
 class ModelAgentClassifierBuilder {
