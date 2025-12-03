@@ -47,7 +47,7 @@ class DefaultEmbeddingAgentClassifier(
     ) {
         val classifiedAgentId = result.classifiedAgents.firstOrNull()?.id ?: "none"
         this
-            .atInfo()
+            .atDebug()
             .addKeyValue("classifier-type", "Vector")
             .addKeyValue("classifier-user-message", request.inputContext.userMessage)
             .addKeyValue("classifier-embedding-search-queries", searchQueries)

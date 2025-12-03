@@ -58,7 +58,7 @@ internal class DefaultModelAgentClassifierTest {
         // given
         val request = modelClassificationRequest()
 
-        val expectedAgentId = jacksonObjectMapper().writeValueAsString(ClassifiedAgentResult("weather-bot", "customer wants weather info"))
+        val expectedAgentId = jacksonObjectMapper().writeValueAsString(ClassifiedAgentResult("customer wants weather info", "weather-bot"))
         val expectedClassifiedAgent = ClassifiedAgent("weather-bot", "weather-bot-name", "weather-bot-address")
         val expectedCandidateAgents = agentProvider.provide(request)
         val chatResponse = ChatResponse.builder().aiMessage(AiMessage((expectedAgentId))).build()
@@ -71,6 +71,7 @@ internal class DefaultModelAgentClassifierTest {
         // then
         assertThat(classification.classifiedAgents).isEqualTo(listOf(expectedClassifiedAgent))
         assertThat(classification.candidateAgents).isEqualTo(expectedCandidateAgents)
+        assertThat(classification.reason).isEqualTo("customer wants weather info")
         assertThat(messagesSlot.captured.messages()).hasSize(4)
 
         assertThat(messagesSlot.captured.messages()[0]).isInstanceOf(SystemMessage::class.java)
@@ -91,7 +92,7 @@ internal class DefaultModelAgentClassifierTest {
         // given
         val request = modelClassificationRequest()
 
-        val expectedAgentId = jacksonObjectMapper().writeValueAsString(ClassifiedAgentResult(null, "no suitable agent found"))
+        val expectedAgentId = jacksonObjectMapper().writeValueAsString(ClassifiedAgentResult("no suitable agent found", null))
         val expectedCandidateAgents = agentProvider.provide(request)
         val chatResponse = ChatResponse.builder().aiMessage(AiMessage((expectedAgentId))).build()
         val messagesSlot = slot<ChatRequest>()

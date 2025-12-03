@@ -63,10 +63,12 @@ data class SystemContext(
  * @property candidateAgents The agents considered during classification, depending on the classification strategy:
  * - **Embedding-based classifier**; candidates originate from semantic search.
  * - **LLM-based classifier**; candidates derived from [AgentProvider]s.
+ * @property reason A concise explanation of the classification decision, present only for LLM-based classifications.
  */
 open class ClassificationResult(
     var classifiedAgents: List<ClassifiedAgent>,
     val candidateAgents: List<Agent> = emptyList(),
+    val reason: String = "",
 )
 
 /**
