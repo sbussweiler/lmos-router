@@ -67,7 +67,7 @@ class FastTrackAgentClassifier(
     ) {
         val classifiedAgentId = result.classifiedAgents.firstOrNull()?.id ?: "none"
         this
-            .atInfo()
+            .atDebug()
             .addKeyValue("classifier-type", "Hybrid-Fasttrack")
             .addKeyValue("classifier-user-message", request.inputContext.userMessage)
             .addKeyValue("classifier-is-fasttrack", isFastTrack)

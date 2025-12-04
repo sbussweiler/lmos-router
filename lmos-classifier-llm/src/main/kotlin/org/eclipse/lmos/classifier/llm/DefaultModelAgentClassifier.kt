@@ -104,7 +104,7 @@ class DefaultModelAgentClassifier(
         return if (agent == null) {
             ClassificationResult(emptyList(), agents)
         } else {
-            ClassificationResult(listOf(ClassifiedAgent(agent.id, agent.name, agent.address)), agents)
+            ClassificationResult(listOf(ClassifiedAgent(agent.id, agent.name, agent.address)), agents, response.reason)
         }
     }
 
@@ -118,7 +118,7 @@ class DefaultModelAgentClassifier(
             }
         val classifiedAgentId = result.classifiedAgents.firstOrNull()?.id ?: "none"
         this
-            .atInfo()
+            .atDebug()
             .addKeyValue("classifier-type", "LLM")
             .addKeyValue("classifier-user-message", request.inputContext.userMessage)
             .addKeyValue("classifier-candidate-agents", candidateAgents)
@@ -137,8 +137,8 @@ class DefaultModelAgentClassifier(
 }
 
 data class ClassifiedAgentResult(
-    val agentId: String?,
     val reason: String,
+    val agentId: String?,
 )
 
 data class LlmCandidateAgent(

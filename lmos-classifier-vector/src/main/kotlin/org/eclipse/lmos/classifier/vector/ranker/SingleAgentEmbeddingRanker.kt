@@ -84,7 +84,7 @@ class SingleAgentEmbeddingRanker(
         rankingMatch: Boolean,
     ) {
         this
-            .atInfo()
+            .atDebug()
             .addKeyValue("classifier-embedding-ranking-thresholds", thresholds)
             .addKeyValue("classifier-embedding-ranking-evaluation", embeddingRankingEvaluation)
             .addKeyValue("classifier-embedding-ranking-top-agent", topAgent)

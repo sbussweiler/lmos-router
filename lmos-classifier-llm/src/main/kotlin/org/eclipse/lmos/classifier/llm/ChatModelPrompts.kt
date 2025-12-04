@@ -30,13 +30,13 @@ fun defaultSystemPrompt(): String =
 
     Format your answer as a single JSON object, for example:
     Example question: "Mobile"
-    Example answer: {"agentId": null, "reason": "It is unclear what the customer means by 'Mobile'."}
+    Example answer: {"reason": "It is unclear what the customer means by 'Mobile'.", "agentId": null}
 
     Example question: "Order status"
-    Example answer: {"agentId": "order-agent-service", "reason": "Customer wants to know the status of their order."}
+    Example answer: {"reason": "Customer wants to know the status of their order.", "agentId": "order-agent-service"}
 
     Example question: "Hello"
-    Example answer: {"agentId": null, "reason": "The request is a greeting and there is no agent for that."}
+    Example answer: {"reason": "The request is a greeting and there is no agent for that.", "agentId": null}
     """.trimIndent()
 
 fun defaultGermanSystemPrompt(): String =
@@ -65,11 +65,11 @@ fun defaultGermanSystemPrompt(): String =
 
     Antworte in einem einzelnen JSON-Format wie im Beispiel.
     Beispielanfrage: "Mobilfunk"
-    Beispielantwort: {"agentId": null, "reason": "Es ist nicht klar was der Kunde mit \"Mobilfunk\" meint."}
+    Beispielantwort: {"reason": "Es ist nicht klar was der Kunde mit \"Mobilfunk\" meint.", agentId": null}
 
     Beispielanfrage: "Auftragsstatus"
-    Beispielantwort: {"agentId": "order-agent-service", "reason": "Der Kunde will den Status eines Auftrags erfahren"}
+    Beispielantwort: {"reason": "Der Kunde will den Status eines Auftrags erfahren", "agentId": "order-agent-service"}
 
     Beispielanfrage: "Guten Tag"
-    Beispielantwort: {"agentId": null, "reason": "Die Anfrage eine Begrüßung und ist nicht Telekom-spezifisch"}
+    Beispielantwort: {"reason": "Die Anfrage eine Begrüßung und ist nicht Telekom-spezifisch", agentId": null}
     """.trimIndent()
