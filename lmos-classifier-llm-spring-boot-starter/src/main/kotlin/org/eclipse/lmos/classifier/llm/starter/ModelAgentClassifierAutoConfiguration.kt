@@ -8,10 +8,13 @@ import dev.langchain4j.model.chat.ChatModel
 import org.eclipse.lmos.classifier.core.llm.AgentProvider
 import org.eclipse.lmos.classifier.core.llm.ModelAgentClassifier
 import org.eclipse.lmos.classifier.core.starter.ChatModelProperties
+import org.eclipse.lmos.classifier.core.tracing.ClassifierTracer
+import org.eclipse.lmos.classifier.core.tracing.NoopClassifierTracer
 import org.eclipse.lmos.classifier.llm.ChatModelClientProperties
 import org.eclipse.lmos.classifier.llm.ClassifierChatModelListener
 import org.eclipse.lmos.classifier.llm.DefaultModelAgentClassifier
 import org.eclipse.lmos.classifier.llm.LangChainChatModelFactory
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -52,11 +55,13 @@ open class ModelAgentClassifierAutoConfiguration {
         chatModel: ChatModel,
         chatModelProperties: ChatModelProperties,
         agentProviders: List<AgentProvider>,
+        tracerProvider: ObjectProvider<ClassifierTracer>,
     ): ModelAgentClassifier =
         DefaultModelAgentClassifier
             .builder()
             .withChatModel(chatModel)
             .withSystemPromptTemplate(chatModelProperties.systemPrompt)
             .withAgentProviders(agentProviders)
+            .withTracer(tracerProvider.getIfAvailable { NoopClassifierTracer() })
             .build()
 }
