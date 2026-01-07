@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Deutsche Telekom AG and others
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.eclipse.lmos.classifier.llm
 
 import dev.langchain4j.data.message.AiMessage
