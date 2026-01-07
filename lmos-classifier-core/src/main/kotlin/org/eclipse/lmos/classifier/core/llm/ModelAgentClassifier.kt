@@ -20,7 +20,7 @@ interface ModelAgentClassifier : AgentClassifier {
      * @param request The classification request containing input and system context information.
      * @return A [ClassificationResult] representing the agents identified as most relevant.
      */
-    override fun classify(request: ClassificationRequest): ClassificationResult
+    override suspend fun classify(request: ClassificationRequest): ClassificationResult
 
     /**
      * Classifies the given request using both the provided [agents], and the agents
@@ -30,7 +30,7 @@ interface ModelAgentClassifier : AgentClassifier {
      * @param agents Additional candidate agents to consider during classification.
      * @return A [ClassificationResult] representing the agents identified as most relevant.
      */
-    fun classify(
+    suspend fun classify(
         request: ClassificationRequest,
         agents: List<Agent>,
     ): ClassificationResult

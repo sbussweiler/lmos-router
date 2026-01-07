@@ -5,6 +5,7 @@
 package org.eclipse.lmos.classifier.hybrid
 
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.lmos.classifier.core.*
 import org.eclipse.lmos.classifier.core.HistoryMessageRole.*
@@ -58,43 +59,45 @@ class FastTrackAgentClassifierTest {
         )
 
     @Test
-    fun `classify should return classification result from vector-search`() {
-        // given
-        every { embeddingClassifierMock.classify(request) } returns
-            ClassificationResult(
-                classifiedAgents = listOf(classifiedAgent),
-                candidateAgents = candidateAgents,
-            )
+    fun `classify should return classification result from vector-search`(): Unit =
+        runBlocking {
+            // given
+            coEvery { embeddingClassifierMock.classify(request) } returns
+                ClassificationResult(
+                    classifiedAgents = listOf(classifiedAgent),
+                    candidateAgents = candidateAgents,
+                )
 
-        // when
-        val result = underTest.classify(request)
+            // when
+            val result = underTest.classify(request)
 
-        // then
-        assertThat(result.classifiedAgents).isEqualTo(listOf(classifiedAgent))
-        assertThat(result.candidateAgents).isEqualTo(candidateAgents)
-    }
-
-    @Test
-    fun `classify should return classification result from model-search if vector-search returns no agent`() {
-        // given
-        every { embeddingClassifierMock.classify(request) } returns
-            ClassificationResult(
-                classifiedAgents = emptyList(),
-                candidateAgents = candidateAgents,
-            )
-
-        every { modelClassifierMock.classify(any(), listOf(candidateAgent)) } answers {
-            val req = it.invocation.args[0] as ClassificationRequest
-            assertThat(req.inputContext.userMessage).isEqualTo(request.inputContext.userMessage)
-            assertThat(req.inputContext.historyMessages).isEqualTo(request.inputContext.historyMessages)
-            ClassificationResult(classifiedAgents = listOf(classifiedAgent), candidateAgents)
+            // then
+            assertThat(result.classifiedAgents).isEqualTo(listOf(classifiedAgent))
+            assertThat(result.candidateAgents).isEqualTo(candidateAgents)
         }
 
-        // when
-        val result = underTest.classify(request)
+    @Test
+    fun `classify should return classification result from model-search if vector-search returns no agent`(): Unit =
+        runBlocking {
+            // given
+            coEvery { embeddingClassifierMock.classify(request) } returns
+                ClassificationResult(
+                    classifiedAgents = emptyList(),
+                    candidateAgents = candidateAgents,
+                )
 
-        // then
-        assertThat(result.classifiedAgents).isEqualTo(listOf(classifiedAgent))
-        assertThat(result.candidateAgents).isEqualTo(candidateAgents)
-    }
+            coEvery { modelClassifierMock.classify(any(), listOf(candidateAgent)) } answers {
+                val req = it.invocation.args[0] as ClassificationRequest
+                assertThat(req.inputContext.userMessage).isEqualTo(request.inputContext.userMessage)
+                assertThat(req.inputContext.historyMessages).isEqualTo(request.inputContext.historyMessages)
+                ClassificationResult(classifiedAgents = listOf(classifiedAgent), candidateAgents)
+            }
+
+            // when
+            val result = underTest.classify(request)
+
+            // then
+            assertThat(result.classifiedAgents).isEqualTo(listOf(classifiedAgent))
+            assertThat(result.candidateAgents).isEqualTo(candidateAgents)
+        }
 }

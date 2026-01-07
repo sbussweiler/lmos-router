@@ -30,4 +30,5 @@ dependencies {
     testImplementation("dev.langchain4j:langchain4j-google-ai-gemini:$langChain4jVersion")
     testImplementation("dev.langchain4j:langchain4j-ollama:$langChain4jVersion")
     testImplementation("com.azure:azure-identity:1.18.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }

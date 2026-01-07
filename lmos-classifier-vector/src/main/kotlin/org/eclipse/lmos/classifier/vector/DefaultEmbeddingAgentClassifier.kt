@@ -23,7 +23,7 @@ class DefaultEmbeddingAgentClassifier(
 ) : EmbeddingAgentClassifier {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun classify(request: ClassificationRequest): ClassificationResult {
+    override suspend fun classify(request: ClassificationRequest): ClassificationResult {
         val rephrasedMessages = queryRephraser.rephrase(request)
         val embeddings = embeddingRetriever.retrieve(request.systemContext, rephrasedMessages)
         val qualifiedAgentsIds = embeddingRanker.findMostQualifiedAgents(embeddings)

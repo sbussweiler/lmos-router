@@ -23,4 +23,5 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.21.3")
     testImplementation("org.testcontainers:qdrant:1.21.3")
     testImplementation("org.awaitility:awaitility:4.3.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }

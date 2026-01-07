@@ -6,6 +6,7 @@ package org.eclipse.lmos.classifier.vector
 
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.lmos.classifier.core.*
 import org.eclipse.lmos.classifier.core.semantic.*
@@ -43,49 +44,52 @@ class DefaultEmbeddingAgentClassifierTest {
         )
 
     @Test
-    fun `classify should return classification result with expected agent`() {
-        // given
-        val expectedAgent = ClassifiedAgent(embedding.agentId, embedding.agentName, embedding.agentAddress)
-        every { embeddingRetrieverMock.retrieve(request.systemContext, listOf(request.inputContext.userMessage)) } returns
-            listOf(embedding)
-        every { embeddingRankerMock.findMostQualifiedAgents(listOf(embedding)) } returns listOf(expectedAgent.id)
+    fun `classify should return classification result with expected agent`(): Unit =
+        runBlocking {
+            // given
+            val expectedAgent = ClassifiedAgent(embedding.agentId, embedding.agentName, embedding.agentAddress)
+            every { embeddingRetrieverMock.retrieve(request.systemContext, listOf(request.inputContext.userMessage)) } returns
+                listOf(embedding)
+            every { embeddingRankerMock.findMostQualifiedAgents(listOf(embedding)) } returns listOf(expectedAgent.id)
 
-        // when
-        val result = underTest.classify(request)
+            // when
+            val result = underTest.classify(request)
 
-        // then
-        assertThat(result.classifiedAgents).isEqualTo(listOf(expectedAgent))
-        assertThat(result.candidateAgents).hasSize(1)
-        assertThat(result.candidateAgents[0].id).isEqualTo("agent-1")
-    }
-
-    @Test
-    fun `classify should return empty list if no agent is found`() {
-        // given
-        every { embeddingRetrieverMock.retrieve(request.systemContext, listOf(request.inputContext.userMessage)) } returns
-            listOf(embedding)
-        every { embeddingRankerMock.findMostQualifiedAgents(listOf(embedding)) } returns emptyList()
-
-        // when
-        val result = underTest.classify(request)
-
-        // then
-        assertThat(result.classifiedAgents).isEmpty()
-        assertThat(result.candidateAgents).hasSize(1)
-        assertThat(result.candidateAgents[0].id).isEqualTo("agent-1")
-    }
+            // then
+            assertThat(result.classifiedAgents).isEqualTo(listOf(expectedAgent))
+            assertThat(result.candidateAgents).hasSize(1)
+            assertThat(result.candidateAgents[0].id).isEqualTo("agent-1")
+        }
 
     @Test
-    fun `classify can handle empty list of embeddings`() {
-        // given
-        every { embeddingRetrieverMock.retrieve(request.systemContext, listOf(request.inputContext.userMessage)) } returns emptyList()
-        every { embeddingRankerMock.findMostQualifiedAgents(emptyList()) } returns emptyList()
+    fun `classify should return empty list if no agent is found`(): Unit =
+        runBlocking {
+            // given
+            every { embeddingRetrieverMock.retrieve(request.systemContext, listOf(request.inputContext.userMessage)) } returns
+                listOf(embedding)
+            every { embeddingRankerMock.findMostQualifiedAgents(listOf(embedding)) } returns emptyList()
 
-        // when
-        val result = underTest.classify(request)
+            // when
+            val result = underTest.classify(request)
 
-        // then
-        assertThat(result.classifiedAgents).isEmpty()
-        assertThat(result.candidateAgents).isEmpty()
-    }
+            // then
+            assertThat(result.classifiedAgents).isEmpty()
+            assertThat(result.candidateAgents).hasSize(1)
+            assertThat(result.candidateAgents[0].id).isEqualTo("agent-1")
+        }
+
+    @Test
+    fun `classify can handle empty list of embeddings`(): Unit =
+        runBlocking {
+            // given
+            every { embeddingRetrieverMock.retrieve(request.systemContext, listOf(request.inputContext.userMessage)) } returns emptyList()
+            every { embeddingRankerMock.findMostQualifiedAgents(emptyList()) } returns emptyList()
+
+            // when
+            val result = underTest.classify(request)
+
+            // then
+            assertThat(result.classifiedAgents).isEmpty()
+            assertThat(result.candidateAgents).isEmpty()
+        }
 }

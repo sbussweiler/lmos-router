@@ -29,7 +29,7 @@ class ClassifierController(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/llm")
-    fun llm(
+    suspend fun llm(
         @RequestBody request: ClassificationRequest,
     ): ClassificationResult {
         logger.info("Route user query '$request' by ModelAgentClassifier.")
@@ -37,7 +37,7 @@ class ClassifierController(
     }
 
     @PostMapping("/hybrid-fast-track")
-    fun hybridFastTrack(
+    suspend fun hybridFastTrack(
         @RequestBody request: ClassificationRequest,
     ): ClassificationResult {
         logger.info("Route user query '$request' by FastTrackAgentClassifier.")
@@ -45,7 +45,7 @@ class ClassifierController(
     }
 
     @PostMapping("/vector")
-    fun vector(
+    suspend fun vector(
         @RequestBody request: ClassificationRequest,
     ): ClassificationResult {
         logger.info("Route user query '$request' by EmbeddingAgentClassifier.")

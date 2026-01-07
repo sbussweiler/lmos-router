@@ -23,5 +23,5 @@ interface EmbeddingAgentClassifier : AgentClassifier {
      * @param request the classification request
      * @return The classification result with the most appropriate agents
      */
-    override fun classify(request: ClassificationRequest): ClassificationResult
+    override suspend fun classify(request: ClassificationRequest): ClassificationResult
 }

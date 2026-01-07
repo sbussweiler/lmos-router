@@ -38,7 +38,7 @@ class FastTrackAgentClassifier(
 ) : HybridAgentClassifier {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun classify(request: ClassificationRequest): ClassificationResult {
+    override suspend fun classify(request: ClassificationRequest): ClassificationResult {
         val embeddingClassification = embeddingAgentClassifier.classify(request)
         if (embeddingClassification.classifiedAgents.isEmpty()) {
             val modelClassification =

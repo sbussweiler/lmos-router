@@ -14,7 +14,7 @@ interface AgentClassifier {
      * @param request The classification request.
      * @return The classification result.
      */
-    fun classify(request: ClassificationRequest): ClassificationResult
+    suspend fun classify(request: ClassificationRequest): ClassificationResult
 }
 
 /**

@@ -26,6 +26,8 @@ import org.eclipse.lmos.classifier.core.llm.AgentAggregator
 import org.eclipse.lmos.classifier.core.llm.AgentProvider
 import org.eclipse.lmos.classifier.core.llm.ModelAgentClassifier
 import org.eclipse.lmos.classifier.core.llm.SystemPromptRenderer
+import org.eclipse.lmos.classifier.core.tracing.ClassifierTracer
+import org.eclipse.lmos.classifier.core.tracing.NoopClassifierTracer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -34,6 +36,7 @@ class DefaultModelAgentClassifier(
     private val systemPromptTemplate: String,
     private val systemPromptRenderer: SystemPromptRenderer,
     private val agentAggregator: AgentAggregator,
+    private val classifierTracer: ClassifierTracer,
     private val objectMapper: ObjectMapper = jacksonObjectMapper(),
 ) : ModelAgentClassifier {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -44,24 +47,26 @@ class DefaultModelAgentClassifier(
             .jsonSchema(JsonSchemas.jsonSchemaFrom(ClassifiedAgentResult::class.java).get())
             .build()
 
-    override fun classify(request: ClassificationRequest) = doClassify(request, emptyList())
+    override suspend fun classify(request: ClassificationRequest) = doClassify(request, emptyList())
 
-    override fun classify(
+    override suspend fun classify(
         request: ClassificationRequest,
         agents: List<Agent>,
     ) = doClassify(request, agents)
 
-    private fun doClassify(
+    private suspend fun doClassify(
         request: ClassificationRequest,
         agents: List<Agent>,
-    ): ClassificationResult {
-        val candidateAgents = agentAggregator.aggregate(request) + agents
-        val chatRequest = prepareChatRequest(request, candidateAgents)
-        val chatResponse = chatModel.chat(chatRequest)
-        val classificationResult = prepareClassificationResult(chatResponse, candidateAgents)
-        logger.logClassificationResult(request, classificationResult)
-        return classificationResult
-    }
+    ): ClassificationResult =
+        classifierTracer.withSpan("llm") { tags ->
+            val candidateAgents = agentAggregator.aggregate(request) + agents
+            val chatRequest = prepareChatRequest(request, candidateAgents)
+            val chatResponse = chatModel.chat(chatRequest)
+            val classificationResult = prepareClassificationResult(chatResponse, candidateAgents)
+            OpenInferenceTags.applyModelTracingTags(tags, chatRequest, chatResponse)
+            logger.logClassificationResult(request, classificationResult)
+            classificationResult
+        }
 
     private fun prepareChatRequest(
         request: ClassificationRequest,
@@ -155,6 +160,7 @@ class ModelAgentClassifierBuilder {
     private var model: ChatModel? = null
     private var systemPromptTemplate = defaultSystemPrompt()
     private var agentProviders: List<AgentProvider> = emptyList()
+    private var tracer: ClassifierTracer = NoopClassifierTracer()
 
     fun withChatModel(model: ChatModel) =
         apply {
@@ -168,7 +174,12 @@ class ModelAgentClassifierBuilder {
 
     fun withAgentProviders(providers: List<AgentProvider>) =
         apply {
-            agentProviders = providers
+            this.agentProviders = providers
+        }
+
+    fun withTracer(tracer: ClassifierTracer) =
+        apply {
+            this.tracer = tracer
         }
 
     fun build(): DefaultModelAgentClassifier {
@@ -178,6 +189,7 @@ class ModelAgentClassifierBuilder {
             systemPromptTemplate,
             MvelSystemPromptRenderer(),
             DefaultAgentAggregator(agentProviders),
+            tracer,
         )
     }
 }
